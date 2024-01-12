@@ -1,4 +1,4 @@
-package com.hh.wx.v2.entity;
+package com.hh.wx.v2.vo;
 
 import java.math.BigDecimal;
 

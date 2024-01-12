@@ -1,4 +1,4 @@
-package com.hh.wx.v2.entity;
+package com.hh.factory.vo.resp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,16 +24,16 @@ public class WxOrderRespVO {
 	private String outTradeNo;
 
 	/**
-	 * 微信返回信息
+	 * 返回信息
 	 */
-	private Map<String, Object> wxMap;
+	private Map<String, Object> dataMap;
 
 	/**
 	 * 微信返回状态，
 	 * 	成功返回 true
 	 * 	失败返回 false
 	 */
-	private boolean r;
+	private Boolean r;
 
 	/**
 	 * 类型

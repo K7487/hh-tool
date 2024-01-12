@@ -1,32 +1,25 @@
 package com.hh.wx.v2.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.github.wxpay.sdk.WXPay;
 import com.github.wxpay.sdk.WXPayConfig;
 import com.github.wxpay.sdk.WXPayUtil;
-import com.hh.wx.v2.entity.WxOrderReqVO;
-import com.hh.wx.v2.entity.WxOrderRespVO;
-import com.hh.wx.v2.entity.WxRefundReqVO;
+import com.hh.wx.v2.vo.WxOrderReqVO;
+import com.hh.factory.vo.resp.WxOrderRespVO;
+import com.hh.wx.v2.vo.WxRefundReqVO;
 import com.hh.wx.v2.enums.WxPayEnum;
 import com.hh.wx.v2.enums.WxRefundEnum;
 
-import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
-import lombok.extern.log4j.Log4j2;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -346,7 +339,7 @@ public class WxPaymentUtil {
         log.info(HEAD + "微信支付回调:" + result);
         Map<String, Object> map = XMLUtil.decodeXml(result);
         log.info(HEAD + "回调map:{}", JSON.toJSONString(map));
-        wxOrderRespVO.setWxMap(map);
+        wxOrderRespVO.setDataMap(map);
 
         if ("SUCCESS".equals(map.get("result_code")) && "SUCCESS".equals(map.get("return_code"))) {
             wxOrderRespVO.setR(true);
@@ -362,7 +355,7 @@ public class WxPaymentUtil {
                 Map<String, Object> reqInfoMap = XMLUtil.decodeXml(req_info_decrypt);
                 log.info(HEAD + "退款map:{}", JSON.toJSONString(reqInfoMap));
                 wxOrderRespVO.setOutTradeNo(reqInfoMap.get("out_trade_no").toString());
-                wxOrderRespVO.setWxMap(reqInfoMap);
+                wxOrderRespVO.setDataMap(reqInfoMap);
                 wxOrderRespVO.setType(2);
             } else {
                 wxOrderRespVO.setType(1);
