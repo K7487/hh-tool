@@ -16,8 +16,15 @@
 
 #### 使用说明
 
+导入jar包
+```
+<dependency>
+  <groupId>io.github.K7487</groupId>
+  <artifactId>hh-tool</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
 1.  微信支付V2教程
-![img.png](img.png)
 2.  xxxx
 3.  xxxx
 
