@@ -25,7 +25,7 @@ public class PayReqVO {
     /**
      * 订单号
      */
-    private Long orderNo;
+    private String orderNo;
 
     /**
      * 商品描述
@@ -33,12 +33,17 @@ public class PayReqVO {
     private String description;
 
     /**
-     * 支付者
+     * 交易类型
+     * JSAPI: 小程序支付，
+     * NATIVE: 二维码，
+     * APP: app支付，
+     * MWEB: H5支付
      */
-    private String openid;
+    private String tradeType;
 
     /**
-     * 退款金额
+     * openid
+     * 当tradeType=JSAPI时，比传
      */
-    private BigDecimal refundFee;
+    private String openid;
 }

@@ -18,27 +18,12 @@ import java.math.BigDecimal;
 public class RefundReqVO {
 
     /**
-     * 下单金额，单位元（保留2位小数）
-     */
-    private BigDecimal amounts;
-
-    /**
      * 订单号
      */
-    private Long orderNo;
+    private String orderNo;
 
     /**
-     * 商品描述
-     */
-    private String description;
-
-    /**
-     * 支付者
-     */
-    private String openid;
-
-    /**
-     * 退款金额
+     * 退款金额,单位元（保留2位小数）
      */
     private BigDecimal refundFee;
 }

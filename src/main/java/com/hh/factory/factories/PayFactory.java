@@ -5,6 +5,6 @@ import com.hh.factory.products.PayProduct;
 
 public interface PayFactory {
 
-    PayProduct pay(PayType payType);
+    PayProduct init(PayType payType);
 
 }

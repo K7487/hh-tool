@@ -7,13 +7,14 @@ import com.hh.wx.v2.enums.WxPayEnum;
 import com.hh.wx.v2.enums.WxRefundEnum;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.annotation.Documented;
 import java.util.Map;
 
 public interface PayProduct{
     /**
      * 下单
      * @param reqVO
-     * @return
+     * @return 返回收银台信息
      */
     Map<String, String> placeOrder(PayReqVO reqVO);
 
@@ -22,14 +23,14 @@ public interface PayProduct{
      * @param orderNo 订单号
      * @return
      */
-    WxPayEnum orderquery(Long orderNo);
+    WxPayEnum orderquery(String orderNo);
 
     /**
      * 关闭订单
      * @param orderNo 订单号
      * @return
      */
-    Boolean closeorder(Long orderNo);
+    Boolean closeorder(String orderNo);
 
     /**
      * 退款申请
@@ -43,7 +44,7 @@ public interface PayProduct{
      * @param orderNo 订单号
      * @return
      */
-    WxRefundEnum refundquery(Long orderNo);
+    WxRefundEnum refundquery(String orderNo);
 
     /**
      * 支付回调
