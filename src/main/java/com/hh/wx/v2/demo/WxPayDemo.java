@@ -1,6 +1,5 @@
 package com.hh.wx.v2.demo;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -10,8 +9,9 @@ import java.util.Map;
 
 import com.alibaba.fastjson2.JSON;
 import com.github.wxpay.sdk.WXPayConfig;
-import com.hh.wx.v2.entity.WxOrderReqVO;
-import com.hh.wx.v2.entity.WxRefundReqVO;
+import com.hh.enums.PayType;
+import com.hh.wx.v2.vo.WxOrderReqVO;
+import com.hh.wx.v2.vo.WxRefundReqVO;
 import com.hh.wx.v2.enums.WxPayEnum;
 import com.hh.wx.v2.enums.WxRefundEnum;
 import com.hh.wx.v2.util.WxPaymentUtil;
@@ -32,7 +32,21 @@ public class WxPayDemo {
 //		closeorder();
 //		refund();
 //		refundquery();
+		t1(PayType.WX_V3);
+
 	}
+
+	public static void t1(PayType payType) {
+		switch (payType) {
+			case WX_V2:
+				System.out.println("微信V2");
+				return;
+			case WX_V3:
+				System.out.println("微信V3");
+				return;
+		}
+	}
+
 
 	/**
 	 * 下单
