@@ -7,7 +7,7 @@
     <!--gav信息-->
     <groupId>io.github.K7487</groupId>
     <artifactId>hh-tool</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 
     <!--项目信息...-->
     <name>hh-tool</name>
@@ -73,11 +73,11 @@
         </dependency>
 
         <!-- 支付宝支付 -->
-<!--        <dependency>-->
-<!--            <groupId>com.alipay.sdk</groupId>-->
-<!--            <artifactId>alipay-sdk-java</artifactId>-->
-<!--            <version>4.38.183.ALL</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.38.192.ALL</version>
+        </dependency>
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
