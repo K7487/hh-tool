@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.hh.enums.PayType;
 import com.hh.factory.factories.PayFactory;
 import com.hh.factory.products.PayProduct;
+import com.hh.factory.products.impl.AliPayProductImpl;
 import com.hh.factory.products.impl.Wx2PayProductImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class PayFactoryImpl implements PayFactory {
 
     private Wx2PayProductImpl wx2PayProduct;
+    private AliPayProductImpl aliPayProduct;
 
     @Override
     public PayProduct init(PayType payType) {
@@ -31,9 +33,9 @@ public class PayFactoryImpl implements PayFactory {
             case WX_V2:
                 return wx2PayProduct;
             case WX_V3:
-            case ZFB_V2:
-            case ZFB_V3:
                 return null;
+            case ZFB:
+                return aliPayProduct;
             default:
                 throw new RuntimeException("支付类型有误");
         }

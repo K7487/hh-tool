@@ -1,4 +1,4 @@
-package com.hh.wx.v2.enums;
+package com.hh.ali.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,12 +12,10 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public enum WxRefundEnum {
+public enum AliRefundEnum {
 
-	SUCCESS("SUCCESS", "退款成功"),
-	REFUNDCLOSE("REFUNDCLOSE", "退款关闭"),
-	PROCESSING("PROCESSING", "退款处理中"),
-	CHANGE("CHANGE", "退款异常");
+	SUCCESS("REFUND_SUCCESS", "退款成功"),
+	UNKNOWN("UNKNOWN", "退款请求未收到或者退款失败");
 
 	private String code;
 	private String msg;
@@ -28,13 +26,13 @@ public enum WxRefundEnum {
 	 * @param code
 	 * @return
 	 */
-	public static WxRefundEnum codeToEnum(String code) {
-		for (WxRefundEnum values : WxRefundEnum.values()) {
+	public static AliRefundEnum codeToEnum(String code) {
+		for (AliRefundEnum values : AliRefundEnum.values()) {
 			if (values.getCode().equals(code)) {
 				return values;
 			}
 		}
-		throw new RuntimeException("未找到对应枚举");
+		return AliRefundEnum.UNKNOWN;
 	}
 
 	/**
@@ -43,8 +41,8 @@ public enum WxRefundEnum {
 	 * @param msg
 	 * @return
 	 */
-	public static WxRefundEnum msgToEnum(String msg) {
-		for (WxRefundEnum values : WxRefundEnum.values()) {
+	public static AliRefundEnum msgToEnum(String msg) {
+		for (AliRefundEnum values : AliRefundEnum.values()) {
 			if (values.getMsg().equals(msg)) {
 				return values;
 			}
