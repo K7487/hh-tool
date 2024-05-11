@@ -2,6 +2,7 @@ package com.hh.factory.util;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.hh.ali.conig.AliConfig;
+import com.hh.constants.Pay;
 import com.hh.enums.PayType;
 import com.hh.factory.vo.req.PayReqVO;
 import com.hh.wx.v2.constant.WxConstant;
@@ -51,22 +52,23 @@ public class OrderCheck {
         if (ObjectUtil.isEmpty(tradeType)) {
             throw new RuntimeException("交易类型不能为空");
         }
-        if ("JSAPI".equals(tradeType) && ObjectUtil.isEmpty(reqVO.getOpenid())) {
+        if (Pay.TradeType.JSAPI.equals(tradeType) && ObjectUtil.isEmpty(reqVO.getOpenid())) {
             throw new RuntimeException("交易类型为：JSAPI，openid不能为空");
         }
         // 支付宝类型转化
         if (PayType.ZFB.getCode().equals(payType.getCode())) {
             switch (tradeType) {
-                case "JSAPI":
+                case Pay.TradeType.JSAPI:
                     tradeType = "JSAPI_PAY";
                     break;
-                case "NATIVE":
+                case Pay.TradeType.NATIVE:
                     tradeType = "FACE_TO_FACE_PAYMENT";
                     break;
-                case "APP":
-                case "MWEB":
+                case Pay.TradeType.APP:
+                case Pay.TradeType.MWEB:
+                    tradeType = "FAST_INSTANT_TRADE_PAY";
                     break;
-                default: tradeType = "FACE_TO_FACE_PAYMENT";
+                default: throw  new RuntimeException("交易类型类型有误");
             }
         }
         return tradeType;
