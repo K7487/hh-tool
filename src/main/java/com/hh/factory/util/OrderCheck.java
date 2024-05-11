@@ -26,15 +26,7 @@ public class OrderCheck {
      * @return
      */
     public String placeOrderIsNull(PayReqVO reqVO, PayType payType) {
-        if (ObjectUtil.isEmpty(reqVO.getDescription())) {
-            throw new RuntimeException("商品描述不能为空");
-        }
-        if (ObjectUtil.isEmpty(reqVO.getOrderNo())) {
-            throw new RuntimeException("订单号不能为空");
-        }
-        if (ObjectUtil.isEmpty(reqVO.getAmounts())) {
-            throw new RuntimeException("下单金额不能为空");
-        }
+        parameterNull(reqVO);
         String tradeType = null;
         if (ObjectUtil.isNotEmpty(reqVO.getTradeType())) {
             tradeType = reqVO.getTradeType();
@@ -72,5 +64,26 @@ public class OrderCheck {
             }
         }
         return tradeType;
+    }
+
+    /**
+     * 下单参数为空判断
+     * @param reqVO
+     * @return
+     */
+    public void placeOrderIsNull2(PayReqVO reqVO) {
+        parameterNull(reqVO);
+    }
+
+    private void parameterNull(PayReqVO reqVO) {
+        if (ObjectUtil.isEmpty(reqVO.getDescription())) {
+            throw new RuntimeException("商品描述不能为空");
+        }
+        if (ObjectUtil.isEmpty(reqVO.getOrderNo())) {
+            throw new RuntimeException("订单号不能为空");
+        }
+        if (ObjectUtil.isEmpty(reqVO.getAmounts())) {
+            throw new RuntimeException("下单金额不能为空");
+        }
     }
 }

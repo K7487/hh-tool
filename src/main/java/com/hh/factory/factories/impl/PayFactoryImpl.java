@@ -6,10 +6,9 @@ import com.hh.factory.factories.PayFactory;
 import com.hh.factory.products.PayProduct;
 import com.hh.factory.products.impl.AliPayProductImpl;
 import com.hh.factory.products.impl.Wx2PayProductImpl;
+import com.hh.factory.products.impl.Wx3PayProductImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 
@@ -23,6 +22,7 @@ public class PayFactoryImpl implements PayFactory {
 
     private Wx2PayProductImpl wx2PayProduct;
     private AliPayProductImpl aliPayProduct;
+    private Wx3PayProductImpl wx3PayProduct;
 
     @Override
     public PayProduct init(PayType payType) {
@@ -33,7 +33,7 @@ public class PayFactoryImpl implements PayFactory {
             case WX_V2:
                 return wx2PayProduct;
             case WX_V3:
-                return null;
+                return wx3PayProduct;
             case ZFB:
                 return aliPayProduct;
             default:
