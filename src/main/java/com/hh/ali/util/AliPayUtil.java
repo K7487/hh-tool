@@ -14,10 +14,12 @@ import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.*;
 import com.alipay.api.response.*;
 import com.github.wxpay.sdk.WXPayConfig;
+import com.github.wxpay.sdk.WXPayUtil;
 import com.hh.ali.enums.AliPayEnum;
 import com.hh.ali.enums.AliRefundEnum;
 import com.hh.ali.vo.req.AliRefundReqVO;
 import com.hh.ali.vo.resp.AliOrderRespVO;
+import com.hh.constants.Pay;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -49,16 +51,42 @@ public class AliPayUtil {
         log.info(HEAD + "统一下单,入参:{}", JSON.toJSONString(request));
         AlipayTradeCreateResponse response = null;
         try {
-            response = alipayClient.execute(request);
+        switch (model.getProductCode()) {
+            case "JSAPI_PAY":
+                response = alipayClient.execute(request);
+                break;
+            case "QUICK_WAP_WAY":
+                response = alipayClient.pageExecute(request, "POST");
+                break;
+            case "QUICK_MSECURITY_PAY":
+                response = alipayClient.sdkExecute(request);
+                break;
+            case "FAST_INSTANT_TRADE_PAY":
+                response = alipayClient.pageExecute(request);
+                break;
+            default:
+                throw new RuntimeException("支付类型有误");
+        }
+
         } catch (AlipayApiException e) {
             throw new RuntimeException(e);
         }
         log.info(HEAD + "统一下单,出参:{}", JSON.toJSONString(response));
-        if (!response.isSuccess()) {
+        if (response != null && !response.isSuccess()) {
             throw new RuntimeException(response.getSubMsg());
         }
-        log.info(HEAD + "统一下单,返回的结果:{}", response.getTradeNo());
-        return response.getTradeNo();
+        switch (model.getProductCode()) {
+            case "JSAPI_PAY":
+                log.info(HEAD + "统一下单,返回的结果:{}", response.getTradeNo());
+                return response.getTradeNo();
+            case "QUICK_WAP_WAY":
+            case "QUICK_MSECURITY_PAY":
+            case "FAST_INSTANT_TRADE_PAY":
+                log.info(HEAD + "统一下单,返回的结果:{}", response.getBody());
+                return response.getBody();
+            default:
+                throw new RuntimeException("支付类型有误");
+        }
     }
 
     /**

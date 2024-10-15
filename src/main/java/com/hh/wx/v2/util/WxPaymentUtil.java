@@ -11,6 +11,7 @@ import com.alibaba.fastjson2.JSON;
 import com.github.wxpay.sdk.WXPay;
 import com.github.wxpay.sdk.WXPayConfig;
 import com.github.wxpay.sdk.WXPayUtil;
+import com.hh.constants.Pay;
 import com.hh.wx.v2.vo.WxOrderReqVO;
 import com.hh.factory.vo.resp.WxOrderRespVO;
 import com.hh.wx.v2.vo.WxRefundReqVO;
@@ -111,15 +112,31 @@ public class WxPaymentUtil {
 
         String prepayId = resqMap.get("prepay_id");
         Map<String, String> data = new TreeMap<>();
-        data.put("appId", config.getAppID());
-        data.put("timeStamp", String.valueOf(System.currentTimeMillis() / 1000));
-        data.put("nonceStr", WXPayUtil.generateNonceStr());
-        data.put("package", "prepay_id=" + prepayId);
-        data.put("signType", "MD5");
-        try {
-            data.put("sign", WXPayUtil.generateSignature(data, config.getKey()));
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        switch (reqVO.getTradeType()) {
+            case Pay.TradeType.JSAPI:
+                data.put("appId", config.getAppID());
+                data.put("timeStamp", String.valueOf(System.currentTimeMillis() / 1000));
+                data.put("nonceStr", WXPayUtil.generateNonceStr());
+                data.put("package", "prepay_id=" + prepayId);
+                data.put("signType", "MD5");
+                try {
+                    data.put("sign", WXPayUtil.generateSignature(data, config.getKey()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case Pay.TradeType.NATIVE:
+                data.put("code_url", resqMap.get("code_url"));
+                break;
+            case Pay.TradeType.APP:
+                data.put("prepay_id", resqMap.get("prepay_id"));
+                break;
+            case Pay.TradeType.MWEB:
+                data.put("mweb_url", resqMap.get("mweb_url"));
+                break;
+            default:
+                throw new RuntimeException("支付类型有误");
         }
         log.info(HEAD + "统一下单,返回的结果:{}", JSON.toJSONString(data));
         return data;
@@ -354,12 +371,12 @@ public class WxPaymentUtil {
                 log.info(HEAD + "退款字符串:{}", req_info_decrypt);
                 Map<String, Object> reqInfoMap = XMLUtil.decodeXml(req_info_decrypt);
                 log.info(HEAD + "退款map:{}", JSON.toJSONString(reqInfoMap));
-                wxOrderRespVO.setOutTradeNo(reqInfoMap.get("out_trade_no").toString());
+                wxOrderRespVO.setOrderNo(reqInfoMap.get("out_trade_no").toString());
                 wxOrderRespVO.setDataMap(reqInfoMap);
                 wxOrderRespVO.setType(2);
             } else {
                 wxOrderRespVO.setType(1);
-                wxOrderRespVO.setOutTradeNo(map.get("out_trade_no").toString());
+                wxOrderRespVO.setOrderNo(map.get("out_trade_no").toString());
             }
         } else {
             wxOrderRespVO.setR(false);
