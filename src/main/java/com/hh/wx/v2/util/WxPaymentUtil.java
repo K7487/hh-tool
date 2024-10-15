@@ -371,12 +371,12 @@ public class WxPaymentUtil {
                 log.info(HEAD + "退款字符串:{}", req_info_decrypt);
                 Map<String, Object> reqInfoMap = XMLUtil.decodeXml(req_info_decrypt);
                 log.info(HEAD + "退款map:{}", JSON.toJSONString(reqInfoMap));
-                wxOrderRespVO.setOutTradeNo(reqInfoMap.get("out_trade_no").toString());
+                wxOrderRespVO.setOrderNo(reqInfoMap.get("out_trade_no").toString());
                 wxOrderRespVO.setDataMap(reqInfoMap);
                 wxOrderRespVO.setType(2);
             } else {
                 wxOrderRespVO.setType(1);
-                wxOrderRespVO.setOutTradeNo(map.get("out_trade_no").toString());
+                wxOrderRespVO.setOrderNo(map.get("out_trade_no").toString());
             }
         } else {
             wxOrderRespVO.setR(false);

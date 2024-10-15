@@ -33,7 +33,8 @@ public class PayFactoryImpl implements PayFactory {
             case WX_V2:
                 return wx2PayProduct;
             case WX_V3:
-                return wx3PayProduct;
+//                return wx3PayProduct;
+                throw new RuntimeException("暂时不支持微信V3支付");
             case ZFB:
                 return aliPayProduct;
             default:

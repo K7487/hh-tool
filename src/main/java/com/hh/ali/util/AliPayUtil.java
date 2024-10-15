@@ -47,23 +47,7 @@ public class AliPayUtil {
         } catch (AlipayApiException e) {
             throw new RuntimeException(e);
         }
-
         request.setBizModel(model);
-//        // productCode
-//        switch (model.getProductCode()) {
-//            case "JSAPI_PAY":
-//                request.setBizModel(model);
-//                break;
-//            case Pay.TradeType.NATIVE:
-//                break;
-//            case Pay.TradeType.APP:
-//                break;
-//            case "FAST_INSTANT_TRADE_PAY":
-//                request.setBizContent(model);
-//                break;
-//            default:
-//                throw new RuntimeException("支付类型有误");
-//        }
         log.info(HEAD + "统一下单,入参:{}", JSON.toJSONString(request));
         AlipayTradeCreateResponse response = null;
         try {
@@ -71,9 +55,11 @@ public class AliPayUtil {
             case "JSAPI_PAY":
                 response = alipayClient.execute(request);
                 break;
-            case Pay.TradeType.NATIVE:
+            case "QUICK_WAP_WAY":
+                response = alipayClient.pageExecute(request, "POST");
                 break;
-            case Pay.TradeType.APP:
+            case "QUICK_MSECURITY_PAY":
+                response = alipayClient.sdkExecute(request);
                 break;
             case "FAST_INSTANT_TRADE_PAY":
                 response = alipayClient.pageExecute(request);
@@ -93,10 +79,8 @@ public class AliPayUtil {
             case "JSAPI_PAY":
                 log.info(HEAD + "统一下单,返回的结果:{}", response.getTradeNo());
                 return response.getTradeNo();
-            case Pay.TradeType.NATIVE:
-                return null;
-            case Pay.TradeType.APP:
-                return null;
+            case "QUICK_WAP_WAY":
+            case "QUICK_MSECURITY_PAY":
             case "FAST_INSTANT_TRADE_PAY":
                 log.info(HEAD + "统一下单,返回的结果:{}", response.getBody());
                 return response.getBody();

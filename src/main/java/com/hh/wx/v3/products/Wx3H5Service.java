@@ -76,42 +76,43 @@ public class Wx3H5Service implements PayV3Product {
 
     @Override
     public WxPayEnum orderquery(String orderNo) {
-        if (ObjectUtil.isEmpty(orderNo)) {
-            throw new RuntimeException(HEAD + "订单号不能为空");
-        }
-        Config config = new RSAAutoCertificateConfig.Builder()
-                .merchantId(wx3Constant.getMerchantId())
-                .privateKeyFromPath(wx3Constant.getPrivateKeyPath())
-                .merchantSerialNumber(wx3Constant.getMerchantSerialNumber())
-                .apiV3Key(wx3Constant.getApiV3Key())
-                .build();
-        AppServiceExtension service = new AppServiceExtension.Builder().config(config).build();
-        QueryOrderByOutTradeNoRequest request = new QueryOrderByOutTradeNoRequest();
-        request.setMchid(wx3Constant.getMchId());
-        request.setOutTradeNo(orderNo);
-        log.info(HEAD + "查询订单状态,入参:{}", JSON.toJSONString(request));
-        Transaction transaction = service.queryOrderByOutTradeNo(request);
-        log.info(HEAD + "查询订单状态,出参:{}", JSON.toJSONString(transaction));
-        return WxPayEnum.codeToEnum(transaction.getTradeState().name());
+//        if (ObjectUtil.isEmpty(orderNo)) {
+//            throw new RuntimeException(HEAD + "订单号不能为空");
+//        }
+//        Config config = new RSAAutoCertificateConfig.Builder()
+//                .merchantId(wx3Constant.getMerchantId())
+//                .privateKeyFromPath(wx3Constant.getPrivateKeyPath())
+//                .merchantSerialNumber(wx3Constant.getMerchantSerialNumber())
+//                .apiV3Key(wx3Constant.getApiV3Key())
+//                .build();
+//        AppServiceExtension service = new AppServiceExtension.Builder().config(config).build();
+//        QueryOrderByOutTradeNoRequest request = new QueryOrderByOutTradeNoRequest();
+//        request.setMchid(wx3Constant.getMchId());
+//        request.setOutTradeNo(orderNo);
+//        log.info(HEAD + "查询订单状态,入参:{}", JSON.toJSONString(request));
+//        Transaction transaction = service.queryOrderByOutTradeNo(request);
+//        log.info(HEAD + "查询订单状态,出参:{}", JSON.toJSONString(transaction));
+//        return WxPayEnum.codeToEnum(transaction.getTradeState().name());
+        return null;
     }
 
     @Override
     public Boolean closeorder(String orderNo) {
-        if (ObjectUtil.isEmpty(orderNo)) {
-            throw new RuntimeException(HEAD + "订单号不能为空");
-        }
-        Config config = new RSAAutoCertificateConfig.Builder()
-                .merchantId(wx3Constant.getMerchantId())
-                .privateKeyFromPath(wx3Constant.getPrivateKeyPath())
-                .merchantSerialNumber(wx3Constant.getMerchantSerialNumber())
-                .apiV3Key(wx3Constant.getApiV3Key())
-                .build();
-        AppServiceExtension service = new AppServiceExtension.Builder().config(config).build();
-        CloseOrderRequest request = new CloseOrderRequest();
-        request.setMchid(wx3Constant.getMchId());
-        request.setOutTradeNo(orderNo);
-        log.info(HEAD + "关闭订单,入参:{}", JSON.toJSONString(request));
-        service.closeOrder(request);
+//        if (ObjectUtil.isEmpty(orderNo)) {
+//            throw new RuntimeException(HEAD + "订单号不能为空");
+//        }
+//        Config config = new RSAAutoCertificateConfig.Builder()
+//                .merchantId(wx3Constant.getMerchantId())
+//                .privateKeyFromPath(wx3Constant.getPrivateKeyPath())
+//                .merchantSerialNumber(wx3Constant.getMerchantSerialNumber())
+//                .apiV3Key(wx3Constant.getApiV3Key())
+//                .build();
+//        AppServiceExtension service = new AppServiceExtension.Builder().config(config).build();
+//        CloseOrderRequest request = new CloseOrderRequest();
+//        request.setMchid(wx3Constant.getMchId());
+//        request.setOutTradeNo(orderNo);
+//        log.info(HEAD + "关闭订单,入参:{}", JSON.toJSONString(request));
+//        service.closeOrder(request);
         return true;
     }
 

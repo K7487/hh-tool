@@ -54,11 +54,13 @@ public class OrderCheck {
                     tradeType = "JSAPI_PAY";
                     break;
                 case Pay.TradeType.NATIVE:
-                    tradeType = "FACE_TO_FACE_PAYMENT";
+                    tradeType = "FAST_INSTANT_TRADE_PAY";
                     break;
                 case Pay.TradeType.APP:
+                    tradeType = "QUICK_MSECURITY_PAY";
+                    break;
                 case Pay.TradeType.MWEB:
-                    tradeType = "FAST_INSTANT_TRADE_PAY";
+                    tradeType = "QUICK_WAP_WAY";
                     break;
                 default: throw  new RuntimeException("交易类型类型有误");
             }

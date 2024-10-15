@@ -19,9 +19,9 @@ public class WxOrderRespVO {
 
 
 	/**
-	 * 商户订单号
+	 * 订单号
 	 */
-	private String outTradeNo;
+	private String orderNo;
 
 	/**
 	 * 返回信息
