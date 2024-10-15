@@ -26,4 +26,14 @@ public class RefundReqVO {
      * 退款金额,单位元（保留2位小数）
      */
     private BigDecimal refundFee;
+
+    /**
+     * 订单金额,单位元（保留2位小数）,微信部分退款使用
+     */
+    private BigDecimal totalFee;
+
+    /**
+     * 退款订单号,标识一次退款请求,部分退款使用
+     */
+    private String outRequestNo;
 }

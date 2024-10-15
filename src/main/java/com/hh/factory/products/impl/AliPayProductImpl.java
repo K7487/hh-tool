@@ -1,8 +1,15 @@
 package com.hh.factory.products.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson2.JSON;
+import com.alipay.api.domain.AlipayTradeAppPayModel;
 import com.alipay.api.domain.AlipayTradeCreateModel;
+import com.alipay.api.domain.AlipayTradePagePayModel;
+import com.alipay.api.domain.AlipayTradeWapPayModel;
+import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.request.AlipayTradeCreateRequest;
+import com.alipay.api.request.AlipayTradePagePayRequest;
+import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.hh.ali.conig.AliConfig;
 import com.hh.ali.enums.AliPayEnum;
 import com.hh.ali.enums.AliRefundEnum;
@@ -37,24 +44,78 @@ public class AliPayProductImpl implements PayProduct {
     @Override
     public String placeOrder(PayReqVO reqVO) {
         String tradeType = orderCheck.placeOrderIsNull(reqVO, PayType.ZFB);
-        AlipayTradeCreateModel model = new AlipayTradeCreateModel();
-        model.setOutTradeNo(reqVO.getOrderNo());
-        model.setTotalAmount(reqVO.getAmounts().toString());
-        model.setSubject(reqVO.getDescription());
-        model.setProductCode(tradeType);
-        model.setOpAppId(config.getOpAppId());
-        model.setBuyerId(reqVO.getOpenid());
-        AlipayTradeCreateRequest request = new AlipayTradeCreateRequest();
-        request.setNotifyUrl(config.getNotifyUrl());
         String tradeNo = null;
-        try {
-            tradeNo = AliPayUtil.unifiedorder(model, config, request);
-            log.info(HEAD + "下单成功:{}", tradeNo);
-        } catch (Exception e) {
-            log.error(HEAD + "下单失败：", e);
-            throw new RuntimeException(HEAD + "下单失败:{}" + e.getMessage());
+        switch (tradeType) {
+            case "JSAPI_PAY":
+                AlipayTradeCreateModel model1 = new AlipayTradeCreateModel();
+                AlipayTradeCreateRequest request1 = new AlipayTradeCreateRequest();
+                model1.setOutTradeNo(reqVO.getOrderNo());
+                model1.setTotalAmount(reqVO.getAmounts().toString());
+                model1.setSubject(reqVO.getDescription());
+                model1.setProductCode(tradeType);
+                model1.setOpAppId(config.getOpAppId());
+                model1.setBuyerId(reqVO.getOpenid());
+                request1.setNotifyUrl(config.getNotifyUrl());
+                try {
+                    tradeNo = AliPayUtil.unifiedorder(model1, config, request1);
+                    log.info(HEAD + "下单成功:{}", tradeNo);
+                } catch (Exception e) {
+                    log.error(HEAD + "下单失败：", e);
+                    throw new RuntimeException(HEAD + "下单失败:{}" + e.getMessage());
+                }
+                return tradeNo;
+            case "QUICK_WAP_WAY":
+                AlipayTradeWapPayModel model4 = new AlipayTradeWapPayModel();
+                AlipayTradeWapPayRequest request4 = new AlipayTradeWapPayRequest();
+                model4.setOutTradeNo(reqVO.getOrderNo());
+                model4.setTotalAmount(reqVO.getAmounts().toString());
+                model4.setSubject(reqVO.getDescription());
+                model4.setProductCode(tradeType);
+                request4.setNotifyUrl(config.getNotifyUrl());
+                try {
+                    tradeNo = AliPayUtil.unifiedorder(model4, config, request4);
+                    log.info(HEAD + "下单成功:{}", tradeNo);
+                } catch (Exception e) {
+                    log.error(HEAD + "下单失败：", e);
+                    throw new RuntimeException(HEAD + "下单失败:{}" + e.getMessage());
+                }
+                return tradeNo;
+            case "QUICK_MSECURITY_PAY":
+                AlipayTradeAppPayModel model3 = new AlipayTradeAppPayModel();
+                AlipayTradeAppPayRequest request3 = new AlipayTradeAppPayRequest();
+                model3.setOutTradeNo(reqVO.getOrderNo());
+                model3.setTotalAmount(reqVO.getAmounts().toString());
+                model3.setSubject(reqVO.getDescription());
+                model3.setProductCode(tradeType);
+                request3.setNotifyUrl(config.getNotifyUrl());
+                request3.setBizModel(model3);
+                try {
+                    tradeNo = AliPayUtil.unifiedorder(model3, config, request3);
+                    log.info(HEAD + "下单成功:{}", tradeNo);
+                } catch (Exception e) {
+                    log.error(HEAD + "下单失败：", e);
+                    throw new RuntimeException(HEAD + "下单失败:{}" + e.getMessage());
+                }
+                return tradeNo;
+            case "FAST_INSTANT_TRADE_PAY":
+                AlipayTradePagePayModel model2 = new AlipayTradePagePayModel();
+                AlipayTradePagePayRequest request2 = new AlipayTradePagePayRequest();
+                model2.setOutTradeNo(reqVO.getOrderNo());
+                model2.setTotalAmount(reqVO.getAmounts().toString());
+                model2.setSubject(reqVO.getDescription());
+                model2.setProductCode(tradeType);
+                request2.setNotifyUrl(config.getNotifyUrl());
+                try {
+                    tradeNo = AliPayUtil.unifiedorder(model2, config, request2);
+                    log.info(HEAD + "下单成功:{}", tradeNo);
+                } catch (Exception e) {
+                    log.error(HEAD + "下单失败：", e);
+                    throw new RuntimeException(HEAD + "下单失败:{}" + e.getMessage());
+                }
+                return tradeNo;
+            default:
+                throw new RuntimeException("支付类型有误");
         }
-        return tradeNo;
     }
 
     @Override
@@ -88,6 +149,9 @@ public class AliPayProductImpl implements PayProduct {
         AliRefundReqVO aliRefundReqVO = new AliRefundReqVO();
         aliRefundReqVO.setOrderNo(reqVO.getOrderNo());
         aliRefundReqVO.setRefundAmount(reqVO.getRefundFee());
+        if (ObjectUtil.isNotEmpty(reqVO.getOutRequestNo())) {
+            aliRefundReqVO.setOutRequestNo(reqVO.getOutRequestNo());
+        }
         Boolean b = null;
         try {
             b = AliPayUtil.refund(aliRefundReqVO, config);
