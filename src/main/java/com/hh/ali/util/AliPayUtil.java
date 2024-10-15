@@ -1,6 +1,7 @@
 package com.hh.ali.util;
 
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import com.alibaba.fastjson.JSON;
@@ -10,6 +11,7 @@ import com.alipay.api.AlipayClient;
 import com.alipay.api.AlipayConfig;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayTradeCreateModel;
+import com.alipay.api.domain.AlipayTradePagePayModel;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.*;
 import com.alipay.api.response.*;
@@ -67,6 +69,62 @@ public class AliPayUtil {
             default:
                 throw new RuntimeException("支付类型有误");
         }
+
+        } catch (AlipayApiException e) {
+            throw new RuntimeException(e);
+        }
+        log.info(HEAD + "统一下单,出参:{}", JSON.toJSONString(response));
+        if (response != null && !response.isSuccess()) {
+            throw new RuntimeException(response.getSubMsg());
+        }
+        switch (model.getProductCode()) {
+            case "JSAPI_PAY":
+                log.info(HEAD + "统一下单,返回的结果:{}", response.getTradeNo());
+                return response.getTradeNo();
+            case "QUICK_WAP_WAY":
+            case "QUICK_MSECURITY_PAY":
+            case "FAST_INSTANT_TRADE_PAY":
+                log.info(HEAD + "统一下单,返回的结果:{}", response.getBody());
+                return response.getBody();
+            default:
+                throw new RuntimeException("支付类型有误");
+        }
+    }
+
+    /**
+     * 支付宝统一下单
+     *
+     * @param model
+     * @param config
+     * @return 成功:返回参数支付宝交易号 失败:抛出异常
+     */
+    public static String unifiedorder(AlipayTradePagePayModel model, AlipayConfig config, AlipayTradePagePayRequest request) {
+        AlipayClient alipayClient = null;
+        try {
+            alipayClient = new DefaultAlipayClient(config);
+        } catch (AlipayApiException e) {
+            throw new RuntimeException(e);
+        }
+        request.setBizModel(model);
+        log.info(HEAD + "统一下单,入参:{}", JSON.toJSONString(request));
+        AlipayTradePagePayResponse response = null;
+        try {
+            switch (model.getProductCode()) {
+                case "JSAPI_PAY":
+                    response = alipayClient.execute(request);
+                    break;
+                case "QUICK_WAP_WAY":
+                    response = alipayClient.pageExecute(request, "POST");
+                    break;
+                case "QUICK_MSECURITY_PAY":
+                    response = alipayClient.sdkExecute(request);
+                    break;
+                case "FAST_INSTANT_TRADE_PAY":
+                    response = alipayClient.pageExecute(request);
+                    break;
+                default:
+                    throw new RuntimeException("支付类型有误");
+            }
 
         } catch (AlipayApiException e) {
             throw new RuntimeException(e);
@@ -174,6 +232,9 @@ public class AliPayUtil {
         JSONObject bizContent = new JSONObject();
         bizContent.put("out_trade_no", reqVO.getOrderNo());
         bizContent.put("refund_amount", reqVO.getRefundAmount());
+        if (ObjectUtil.isNotEmpty(reqVO.getOutRequestNo())) {
+            bizContent.put("out_request_no", reqVO.getOutRequestNo());
+        }
         request.setBizContent(bizContent.toString());
         AlipayTradeRefundResponse response = null;
         try {
