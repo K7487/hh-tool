@@ -3,6 +3,7 @@ package com.hh.factory.products.impl;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson2.JSON;
+import com.hh.constants.Pay;
 import com.hh.enums.PayType;
 import com.hh.factory.products.PayProduct;
 import com.hh.factory.util.OrderCheck;
@@ -52,8 +53,13 @@ public class Wx2PayProductImpl implements PayProduct {
         wxOrderReqVO.setOutTradeNo(reqVO.getOrderNo());
         wxOrderReqVO.setTotalFee(reqVO.getAmounts());
         wxOrderReqVO.setOpenid(reqVO.getOpenid());
+        wxOrderReqVO.setAuthCode(reqVO.getAuthCode());
         try {
-            map = WxPaymentUtil.unifiedorder(wxOrderReqVO, wxConfig);
+            if (Pay.TradeType.MICROPAY.equals(reqVO.getTradeType())) {
+                map = WxPaymentUtil.microPay(wxOrderReqVO, wxConfig);
+            } else {
+                map = WxPaymentUtil.unifiedorder(wxOrderReqVO, wxConfig);
+            }
         } catch (Exception e) {
             log.error(HEAD + "下单失败：", e);
             throw new RuntimeException(HEAD + "下单失败：" + e.getMessage());

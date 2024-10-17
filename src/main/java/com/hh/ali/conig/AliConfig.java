@@ -29,6 +29,7 @@ public class AliConfig extends AlipayConfig {
      * NATIVE: 二维码，
      * APP: app支付，
      * MWEB: H5支付
+     * MICROPAY：付款码支付
      */
     private String tradeType;
 }

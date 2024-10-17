@@ -72,7 +72,12 @@ public class WxOrderReqVO {
 	private String notifyUrl;
 
 	/**
-	 * 交易类型 JSAPI:小程序支付，NATIVE:二维码，APP，MWEB:H5支付
+	 * 交易类型
+	 * JSAPI:小程序支付
+	 * NATIVE:二维码
+	 * APP:app支付
+	 * MWEB:H5支付
+	 * MICROPAY：付款码支付
 	 */
 	private String tradeType;
 
@@ -101,4 +106,9 @@ public class WxOrderReqVO {
 	 */
 	private String sceneInfo;
 
+	/**
+	 * 支付授权码
+	 * 当tradeType=MICROPAY时，必传
+	 */
+	private String authCode;
 }
