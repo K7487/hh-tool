@@ -62,6 +62,9 @@ public class OrderCheck {
                 case Pay.TradeType.MWEB:
                     tradeType = "QUICK_WAP_WAY";
                     break;
+                case Pay.TradeType.MICROPAY:
+                    tradeType = Pay.TradeType.MICROPAY;
+                    break;
                 default: throw  new RuntimeException("交易类型类型有误");
             }
         }

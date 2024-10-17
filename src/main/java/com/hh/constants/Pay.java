@@ -9,22 +9,27 @@ public interface Pay {
         /**
          * 小程序支付
          */
-        public static final String JSAPI = "JSAPI";
+        String JSAPI = "JSAPI";
 
         /**
          * 二维码支付
          */
-        public static final String NATIVE = "NATIVE";
+        String NATIVE = "NATIVE";
 
         /**
          * app支付
          */
-        public static final String APP = "APP";
+        String APP = "APP";
 
         /**
          * H5支付
          */
-        public static final String MWEB = "MWEB";
+        String MWEB = "MWEB";
+
+        /**
+         * 付款码支付
+         */
+        String MICROPAY = "MICROPAY";
     }
 
 }
