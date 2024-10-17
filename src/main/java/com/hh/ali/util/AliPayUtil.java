@@ -10,10 +10,7 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.AlipayConfig;
 import com.alipay.api.DefaultAlipayClient;
-import com.alipay.api.domain.AlipayTradeAppPayModel;
-import com.alipay.api.domain.AlipayTradeCreateModel;
-import com.alipay.api.domain.AlipayTradePagePayModel;
-import com.alipay.api.domain.AlipayTradeWapPayModel;
+import com.alipay.api.domain.*;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.*;
 import com.alipay.api.response.*;
@@ -53,18 +50,18 @@ public class AliPayUtil {
             throw new RuntimeException(e);
         }
         request.setBizModel(model);
-        log.info(HEAD + "统一下单,入参:{}", JSON.toJSONString(request));
+        log.info(HEAD + "统一下单,小程序下单,入参:{}", JSON.toJSONString(request));
         AlipayTradeCreateResponse response = null;
         try {
             response = alipayClient.execute(request);
         } catch (AlipayApiException e) {
             throw new RuntimeException(e);
         }
-        log.info(HEAD + "统一下单,出参:{}", JSON.toJSONString(response));
+        log.info(HEAD + "统一下单,小程序下单,出参:{}", JSON.toJSONString(response));
         if (response != null && !response.isSuccess()) {
             throw new RuntimeException(response.getSubMsg());
         }
-        log.info(HEAD + "统一下单,返回的结果:{}", response.getTradeNo());
+        log.info(HEAD + "统一下单,小程序下单,返回的结果:{}", response.getTradeNo());
         return response.getTradeNo();
     }
 
@@ -84,18 +81,18 @@ public class AliPayUtil {
             throw new RuntimeException(e);
         }
         request.setBizModel(model);
-        log.info(HEAD + "统一下单,入参:{}", JSON.toJSONString(request));
+        log.info(HEAD + "统一下单,二维码支付,入参:{}", JSON.toJSONString(request));
         AlipayTradePagePayResponse response = null;
         try {
             response = alipayClient.pageExecute(request);
         } catch (AlipayApiException e) {
             throw new RuntimeException(e);
         }
-        log.info(HEAD + "统一下单,出参:{}", JSON.toJSONString(response));
+        log.info(HEAD + "统一下单,二维码支付,出参:{}", JSON.toJSONString(response));
         if (response != null && !response.isSuccess()) {
             throw new RuntimeException(response.getSubMsg());
         }
-        log.info(HEAD + "统一下单,返回的结果:{}", response.getBody());
+        log.info(HEAD + "统一下单,二维码支付,返回的结果:{}", response.getBody());
         return response.getBody();
     }
 
@@ -115,18 +112,18 @@ public class AliPayUtil {
             throw new RuntimeException(e);
         }
         request.setBizModel(model);
-        log.info(HEAD + "统一下单,入参:{}", JSON.toJSONString(request));
+        log.info(HEAD + "统一下单,app支付,入参:{}", JSON.toJSONString(request));
         AlipayTradeAppPayResponse response = null;
         try {
             response = alipayClient.sdkExecute(request);
         } catch (AlipayApiException e) {
             throw new RuntimeException(e);
         }
-        log.info(HEAD + "统一下单,出参:{}", JSON.toJSONString(response));
+        log.info(HEAD + "统一下单,app支付,出参:{}", JSON.toJSONString(response));
         if (response != null && !response.isSuccess()) {
             throw new RuntimeException(response.getSubMsg());
         }
-        log.info(HEAD + "统一下单,返回的结果:{}", response.getBody());
+        log.info(HEAD + "统一下单,app支付,返回的结果:{}", response.getBody());
         return response.getBody();
     }
 
@@ -146,18 +143,49 @@ public class AliPayUtil {
             throw new RuntimeException(e);
         }
         request.setBizModel(model);
-        log.info(HEAD + "统一下单,入参:{}", JSON.toJSONString(request));
+        log.info(HEAD + "统一下单,H5支付,入参:{}", JSON.toJSONString(request));
         AlipayTradeWapPayResponse response = null;
         try {
             response = alipayClient.pageExecute(request, "POST");
         } catch (AlipayApiException e) {
             throw new RuntimeException(e);
         }
-        log.info(HEAD + "统一下单,出参:{}", JSON.toJSONString(response));
+        log.info(HEAD + "统一下单,H5支付,出参:{}", JSON.toJSONString(response));
         if (response != null && !response.isSuccess()) {
             throw new RuntimeException(response.getSubMsg());
         }
-        log.info(HEAD + "统一下单,返回的结果:{}", response.getBody());
+        log.info(HEAD + "统一下单,H5支付,返回的结果:{}", response.getBody());
+        return response.getBody();
+    }
+
+    /**
+     * 支付宝统一下单
+     * 付款码支付
+     * @param model
+     * @param config
+     * @param request
+     * @return
+     */
+    public static String unifiedorder(AlipayTradePayModel model, AlipayConfig config, AlipayTradePayRequest request) {
+        AlipayClient alipayClient = null;
+        try {
+            alipayClient = new DefaultAlipayClient(config);
+        } catch (AlipayApiException e) {
+            throw new RuntimeException(e);
+        }
+        request.setBizModel(model);
+        log.info(HEAD + "统一下单,付款码支付,入参:{}", JSON.toJSONString(request));
+        AlipayTradePayResponse response = null;
+        try {
+            response = alipayClient.execute(request);
+        } catch (AlipayApiException e) {
+            throw new RuntimeException(e);
+        }
+        log.info(HEAD + "统一下单,付款码支付,出参:{}", JSON.toJSONString(response));
+        if (response != null && !response.isSuccess()) {
+            throw new RuntimeException(response.getSubMsg());
+        }
+        log.info(HEAD + "统一下单,付款码支付,返回的结果:{}", response.getBody());
         return response.getBody();
     }
 

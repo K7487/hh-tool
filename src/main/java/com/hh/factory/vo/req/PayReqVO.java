@@ -38,12 +38,19 @@ public class PayReqVO {
      * NATIVE: 二维码，
      * APP: app支付，
      * MWEB: H5支付
+     * MICROPAY：付款码支付
      */
     private String tradeType;
 
     /**
      * openid
-     * 当tradeType=JSAPI时，比传
+     * 当tradeType=JSAPI时，必传
      */
     private String openid;
+
+    /**
+     * 支付授权码
+     * 当tradeType=MICROPAY时，必传
+     */
+    private String authCode;
 }

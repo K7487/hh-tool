@@ -47,6 +47,9 @@ public class OrderCheck {
         if (Pay.TradeType.JSAPI.equals(tradeType) && ObjectUtil.isEmpty(reqVO.getOpenid())) {
             throw new RuntimeException("交易类型为：JSAPI，openid不能为空");
         }
+        if (Pay.TradeType.MICROPAY.equals(tradeType) && ObjectUtil.isEmpty(reqVO.getAuthCode())) {
+            throw new RuntimeException("交易类型为：MICROPAY，支付授权码不能为空");
+        }
         // 支付宝类型转化
         if (PayType.ZFB.getCode().equals(payType.getCode())) {
             switch (tradeType) {
@@ -61,6 +64,9 @@ public class OrderCheck {
                     break;
                 case Pay.TradeType.MWEB:
                     tradeType = "QUICK_WAP_WAY";
+                    break;
+                case Pay.TradeType.MICROPAY:
+                    tradeType = Pay.TradeType.MICROPAY;
                     break;
                 default: throw  new RuntimeException("交易类型类型有误");
             }

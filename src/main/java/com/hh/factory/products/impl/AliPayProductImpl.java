@@ -2,14 +2,8 @@ package com.hh.factory.products.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson2.JSON;
-import com.alipay.api.domain.AlipayTradeAppPayModel;
-import com.alipay.api.domain.AlipayTradeCreateModel;
-import com.alipay.api.domain.AlipayTradePagePayModel;
-import com.alipay.api.domain.AlipayTradeWapPayModel;
-import com.alipay.api.request.AlipayTradeAppPayRequest;
-import com.alipay.api.request.AlipayTradeCreateRequest;
-import com.alipay.api.request.AlipayTradePagePayRequest;
-import com.alipay.api.request.AlipayTradeWapPayRequest;
+import com.alipay.api.domain.*;
+import com.alipay.api.request.*;
 import com.hh.ali.conig.AliConfig;
 import com.hh.ali.enums.AliPayEnum;
 import com.hh.ali.enums.AliRefundEnum;
@@ -107,6 +101,23 @@ public class AliPayProductImpl implements PayProduct {
                 request2.setNotifyUrl(config.getNotifyUrl());
                 try {
                     tradeNo = AliPayUtil.unifiedorder(model2, config, request2);
+                    log.info(HEAD + "下单成功:{}", tradeNo);
+                } catch (Exception e) {
+                    log.error(HEAD + "下单失败：", e);
+                    throw new RuntimeException(HEAD + "下单失败:{}" + e.getMessage());
+                }
+                return tradeNo;
+            case "MICROPAY":
+                AlipayTradePayModel model5 = new AlipayTradePayModel();
+                AlipayTradePayRequest request5 = new AlipayTradePayRequest();
+                model5.setOutTradeNo(reqVO.getOrderNo());
+                model5.setTotalAmount(reqVO.getAmounts().toString());
+                model5.setSubject(reqVO.getDescription());
+                model5.setAuthCode(reqVO.getAuthCode());
+                model5.setScene("bar_code");
+                request5.setNotifyUrl(config.getNotifyUrl());
+                try {
+                    tradeNo = AliPayUtil.unifiedorder(model5, config, request5);
                     log.info(HEAD + "下单成功:{}", tradeNo);
                 } catch (Exception e) {
                     log.error(HEAD + "下单失败：", e);

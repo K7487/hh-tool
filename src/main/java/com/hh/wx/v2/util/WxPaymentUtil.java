@@ -35,7 +35,7 @@ public class WxPaymentUtil {
 
     /**
      * 统一下单
-     *
+     * 小程序支付、 二维码支付、 app支付、H5支付
      * @param reqVO  下单业务参数
      * @param config 微信支付配置参数
      * @return 成功:返回收银台信息 失败:抛出异常
@@ -83,46 +83,61 @@ public class WxPaymentUtil {
         if (ObjectUtil.isNotEmpty(reqVO.getSceneInfo())) {
             reqMap.put("scene_info", reqVO.getSceneInfo());
         }
+        if (ObjectUtil.isNotEmpty(reqVO.getAuthCode())) {
+            reqMap.put("auth_code", reqVO.getAuthCode());
+        }
         String sign = null;
         try {
             sign = WXPayUtil.generateSignature(reqMap, config.getKey());
         } catch (Exception e) {
+            log.error("签名失败：", e);
             e.printStackTrace();
         }
         reqMap.put("sign", sign);
-        log.info(HEAD + "统一下单,入参:{}", JSON.toJSONString(reqMap));
+        String payLog = "";
+        switch (reqVO.getTradeType()) {
+            case Pay.TradeType.JSAPI:
+                payLog = "小程序支付";
+                break;
+            case Pay.TradeType.NATIVE:
+                payLog = "二维码支付";
+                break;
+            case Pay.TradeType.APP:
+                payLog = "app支付";
+                break;
+            case Pay.TradeType.MWEB:
+                payLog = "H5支付";
+                break;
+        }
+        log.info(HEAD + "统一下单," + payLog + ",入参:{}", JSON.toJSONString(reqMap));
         Map<String, String> resqMap = new HashMap<>();
         try {
             resqMap = wxPay.unifiedOrder(reqMap);
         } catch (Exception e) {
+            log.error("下单请求失败：", e);
             e.printStackTrace();
         }
-        log.info(HEAD + "统一下单,出参:{}", JSON.toJSONString(resqMap));
+        log.info(HEAD + "统一下单," + payLog + ",出参:{}", JSON.toJSONString(resqMap));
         String return_code = resqMap.get("return_code");
         if ("SUCCESS".equals(return_code)) {
-            String result_code = resqMap.get("result_code");
-            if (!"SUCCESS".equals(result_code)) {
-                String err_code_des = resqMap.get("err_code_des");
-                throw new RuntimeException(err_code_des);
+            if (!"SUCCESS".equals(resqMap.get("result_code"))) {
+                throw new RuntimeException(resqMap.get("err_code_des"));
             }
         } else {
-            String msg = resqMap.get("return_msg").toString();
-            throw new RuntimeException(msg);
+            throw new RuntimeException(resqMap.get("return_msg"));
         }
-
-        String prepayId = resqMap.get("prepay_id");
         Map<String, String> data = new TreeMap<>();
-
         switch (reqVO.getTradeType()) {
             case Pay.TradeType.JSAPI:
                 data.put("appId", config.getAppID());
                 data.put("timeStamp", String.valueOf(System.currentTimeMillis() / 1000));
                 data.put("nonceStr", WXPayUtil.generateNonceStr());
-                data.put("package", "prepay_id=" + prepayId);
+                data.put("package", "prepay_id=" + resqMap.get("prepay_id"));
                 data.put("signType", "MD5");
                 try {
                     data.put("sign", WXPayUtil.generateSignature(data, config.getKey()));
                 } catch (Exception e) {
+                    log.error("签名失败：", e);
                     e.printStackTrace();
                 }
                 break;
@@ -138,8 +153,83 @@ public class WxPaymentUtil {
             default:
                 throw new RuntimeException("支付类型有误");
         }
-        log.info(HEAD + "统一下单,返回的结果:{}", JSON.toJSONString(data));
+        log.info(HEAD + "统一下单," + payLog + ",返回的结果:{}", JSON.toJSONString(data));
         return data;
+    }
+
+    /**
+     * 统一下单
+     * 付款码支付
+     * @param reqVO  下单业务参数
+     * @param config 微信支付配置参数
+     * @return 成功:返回收银台信息 失败:抛出异常
+     */
+    public static Map<String, String> microPay(WxOrderReqVO reqVO, WXPayConfig config) {
+        Map<String, String> reqMap = new TreeMap<>();
+        WXPay wxPay = new WXPay(config);
+        reqMap.put("nonce_str", WXPayUtil.generateNonceStr());
+        // 必填项
+        reqMap.put("body", reqVO.getBody());
+        reqMap.put("out_trade_no", reqVO.getOutTradeNo());
+        Integer total_fee = reqVO.getTotalFee().multiply(new BigDecimal(100)).intValue();
+        reqMap.put("total_fee", total_fee.toString());
+        reqMap.put("spbill_create_ip", reqVO.getSpbillCreateIp());
+        reqMap.put("auth_code", reqVO.getAuthCode());
+        // 选填项
+        if (ObjectUtil.isNotEmpty(reqVO.getAttach())) {
+            reqMap.put("attach", reqVO.getAttach());
+        }
+        if (ObjectUtil.isNotEmpty(reqVO.getFeeType())) {
+            reqMap.put("fee_type", reqVO.getFeeType());
+        }
+        if (ObjectUtil.isNotEmpty(reqVO.getTimeStart())) {
+            reqMap.put("time_start", reqVO.getTimeStart());
+        }
+        if (ObjectUtil.isNotEmpty(reqVO.getTimeExpire())) {
+            reqMap.put("time_expire", reqVO.getTimeExpire());
+        }
+        if (ObjectUtil.isNotEmpty(reqVO.getGoodsTag())) {
+            reqMap.put("goods_tag", reqVO.getGoodsTag());
+        }
+        if (ObjectUtil.isNotEmpty(reqVO.getLimitPay())) {
+            reqMap.put("limit_pay", reqVO.getLimitPay());
+        }
+        if (ObjectUtil.isNotEmpty(reqVO.getReceipt())) {
+            reqMap.put("receipt", reqVO.getReceipt());
+        }
+        if (ObjectUtil.isNotEmpty(reqVO.getSceneInfo())) {
+            reqMap.put("scene_info", reqVO.getSceneInfo());
+        }
+        String sign = null;
+        try {
+            sign = WXPayUtil.generateSignature(reqMap, config.getKey());
+        } catch (Exception e) {
+            log.error("签名失败：", e);
+            e.printStackTrace();
+        }
+        reqMap.put("sign", sign);
+        log.info(HEAD + "统一下单,付款码支付,入参:{}", JSON.toJSONString(reqMap));
+        Map<String, String> resqMap = new HashMap<>();
+        try {
+            resqMap = wxPay.microPay(reqMap);
+        } catch (Exception e) {
+            log.error("下单请求失败：", e);
+            e.printStackTrace();
+        }
+        log.info(HEAD + "统一下单,付款码支付,出参:{}", JSON.toJSONString(resqMap));
+        String return_code = resqMap.get("return_code");
+        if ("SUCCESS".equals(return_code)) {
+            if ("USERPAYING".equals(resqMap.get("err_code"))) {
+                Map<String, String> respMap = new HashMap<>();
+                respMap.put("msg", "支付中");
+                log.info(HEAD + "统一下单,付款码支付,返回的结果:{}", JSON.toJSONString(respMap));
+                return respMap;
+            } else {
+                throw new RuntimeException(resqMap.get("err_code_des"));
+            }
+        } else {
+            throw new RuntimeException(resqMap.get("return_msg"));
+        }
     }
 
     /**
