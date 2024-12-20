@@ -86,6 +86,9 @@ public class WxPaymentUtil {
         if (ObjectUtil.isNotEmpty(reqVO.getAuthCode())) {
             reqMap.put("auth_code", reqVO.getAuthCode());
         }
+        if (ObjectUtil.isNotEmpty(reqVO.getSubMchId())) {
+            reqMap.put("sub_mch_id", reqVO.getSubMchId());
+        }
         String sign = null;
         try {
             sign = WXPayUtil.generateSignature(reqMap, config.getKey());
@@ -199,6 +202,9 @@ public class WxPaymentUtil {
         }
         if (ObjectUtil.isNotEmpty(reqVO.getSceneInfo())) {
             reqMap.put("scene_info", reqVO.getSceneInfo());
+        }
+        if (ObjectUtil.isNotEmpty(reqVO.getSubMchId())) {
+            reqMap.put("sub_mch_id", reqVO.getSubMchId());
         }
         String sign = null;
         try {

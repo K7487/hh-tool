@@ -2,9 +2,9 @@ package com.hh.wx.v2.config;
 
 import com.github.wxpay.sdk.WXPayConfig;
 import com.hh.wx.v2.constant.WxConstant;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -15,7 +15,7 @@ import java.io.InputStream;
 @Component
 public class WxConfig implements WXPayConfig {
 
-    @Resource
+    @Autowired
     private WxConstant wxConstant;
 
     @Override

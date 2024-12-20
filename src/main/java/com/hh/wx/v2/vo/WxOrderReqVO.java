@@ -111,4 +111,9 @@ public class WxOrderReqVO {
 	 * 当tradeType=MICROPAY时，必传
 	 */
 	private String authCode;
+
+	/**
+	 * 子商户号
+	 */
+	private String subMchId;
 }

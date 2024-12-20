@@ -54,6 +54,7 @@ public class Wx2PayProductImpl implements PayProduct {
         wxOrderReqVO.setTotalFee(reqVO.getAmounts());
         wxOrderReqVO.setOpenid(reqVO.getOpenid());
         wxOrderReqVO.setAuthCode(reqVO.getAuthCode());
+        wxOrderReqVO.setSubMchId(reqVO.getSubMchId());
         try {
             if (Pay.TradeType.MICROPAY.equals(reqVO.getTradeType())) {
                 map = WxPaymentUtil.microPay(wxOrderReqVO, wxConfig);
