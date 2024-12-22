@@ -36,4 +36,9 @@ public class RefundReqVO {
      * 退款订单号,标识一次退款请求,部分退款使用
      */
     private String outRequestNo;
+
+    /**
+     * 子商户号
+     */
+    private String subMchId;
 }

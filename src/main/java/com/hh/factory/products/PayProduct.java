@@ -16,17 +16,24 @@ public interface PayProduct{
 
     /**
      * 查询订单
-     * @param orderNo 订单号
+     * @param reqVO
      * @return
      */
-    <T> T orderquery(String orderNo);
+    <T> T orderquery(PayReqVO reqVO);
 
     /**
      * 关闭订单
-     * @param orderNo 订单号
+     * @param reqVO
      * @return
      */
-    Boolean closeorder(String orderNo);
+    Boolean closeorder(PayReqVO reqVO);
+
+    /**
+     * 撤销订单
+     * @param reqVO
+     * @return
+     */
+    Boolean reverse(PayReqVO reqVO);
 
     /**
      * 退款申请
@@ -37,10 +44,10 @@ public interface PayProduct{
 
     /**
      * 查询退款订单
-     * @param orderNo 订单号
+     * @param reqVO
      * @return
      */
-    <T> T refundquery(String orderNo);
+    <T> T refundquery(RefundReqVO reqVO);
 
     /**
      * 支付回调

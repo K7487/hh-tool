@@ -12,6 +12,7 @@ import com.github.wxpay.sdk.WXPay;
 import com.github.wxpay.sdk.WXPayConfig;
 import com.github.wxpay.sdk.WXPayUtil;
 import com.hh.constants.Pay;
+import com.hh.wx.v2.config.WxConfig;
 import com.hh.wx.v2.vo.WxOrderReqVO;
 import com.hh.factory.vo.resp.WxOrderRespVO;
 import com.hh.wx.v2.vo.WxRefundReqVO;
@@ -36,6 +37,7 @@ public class WxPaymentUtil {
     /**
      * 统一下单
      * 小程序支付、 二维码支付、 app支付、H5支付
+     *
      * @param reqVO  下单业务参数
      * @param config 微信支付配置参数
      * @return 成功:返回收银台信息 失败:抛出异常
@@ -163,6 +165,7 @@ public class WxPaymentUtil {
     /**
      * 统一下单
      * 付款码支付
+     *
      * @param reqVO  下单业务参数
      * @param config 微信支付配置参数
      * @return 成功:返回收银台信息 失败:抛出异常
@@ -242,15 +245,19 @@ public class WxPaymentUtil {
      * 查询订单状态
      *
      * @param outTradeNo 订单号
+     * @param subMchId   子商户号
      * @param config     微信支付配置参数
      * @return 成功:返回状态枚举 失败:抛出异常
      */
-    public static WxPayEnum orderquery(String outTradeNo, WXPayConfig config) {
+    public static WxPayEnum orderquery(String outTradeNo, String subMchId, WXPayConfig config) {
         Map<String, String> reqMap = new TreeMap<>();
         WXPay wxPay = new WXPay(config);
         reqMap.put("nonce_str", WXPayUtil.generateNonceStr());
         // 必填项
         reqMap.put("out_trade_no", outTradeNo);
+        if (ObjectUtil.isNotEmpty(subMchId)) {
+            reqMap.put("sub_mch_id", subMchId);
+        }
         String sign = null;
         try {
             sign = WXPayUtil.generateSignature(reqMap, config.getKey());
@@ -286,15 +293,19 @@ public class WxPaymentUtil {
      * 关闭订单
      *
      * @param outTradeNo 订单号
+     * @param subMchId   子商户号
      * @param config     微信支付配置参数
      * @return 成功:返回true 失败:抛出异常
      */
-    public static Boolean closeorder(String outTradeNo, WXPayConfig config) {
+    public static Boolean closeorder(String outTradeNo, String subMchId, WXPayConfig config) {
         Map<String, String> reqMap = new TreeMap<>();
         WXPay wxPay = new WXPay(config);
         reqMap.put("nonce_str", WXPayUtil.generateNonceStr());
         // 必填项
         reqMap.put("out_trade_no", outTradeNo);
+        if (ObjectUtil.isNotEmpty(subMchId)) {
+            reqMap.put("sub_mch_id", subMchId);
+        }
         String sign = null;
         try {
             sign = WXPayUtil.generateSignature(reqMap, config.getKey());
@@ -318,6 +329,49 @@ public class WxPaymentUtil {
             throw new RuntimeException(resqMap.get("return_msg"));
         }
         log.info(HEAD + "关闭订单,返回的结果:{}", true);
+        return true;
+    }
+
+    /**
+     * 撤销订单
+     *
+     * @param outTradeNo 订单号
+     * @param subMchId   子商户号
+     * @param config     微信支付配置参数
+     * @return 成功:返回true 失败:抛出异常
+     */
+    public static Boolean reverse(String outTradeNo, String subMchId, WXPayConfig config) {
+        Map<String, String> reqMap = new TreeMap<>();
+        WXPay wxPay = new WXPay(config);
+        reqMap.put("nonce_str", WXPayUtil.generateNonceStr());
+        // 必填项
+        reqMap.put("out_trade_no", outTradeNo);
+        if (ObjectUtil.isNotEmpty(subMchId)) {
+            reqMap.put("sub_mch_id", subMchId);
+        }
+        String sign = null;
+        try {
+            sign = WXPayUtil.generateSignature(reqMap, config.getKey());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        reqMap.put("sign", sign);
+        log.info(HEAD + "撤销订单,入参:{}", JSON.toJSONString(reqMap));
+        Map<String, String> resqMap = new HashMap<>();
+        try {
+            resqMap = wxPay.reverse(reqMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        log.info(HEAD + "撤销订单,出参:{}", JSON.toJSONString(resqMap));
+        if ("SUCCESS".equals(resqMap.get("return_code"))) {
+            if (!"SUCCESS".equals(resqMap.get("result_code"))) {
+                throw new RuntimeException(resqMap.get("err_code_des"));
+            }
+        } else {
+            throw new RuntimeException(resqMap.get("return_msg"));
+        }
+        log.info(HEAD + "撤销订单,返回的结果:{}", true);
         return true;
     }
 
@@ -353,6 +407,9 @@ public class WxPaymentUtil {
         if (ObjectUtil.isNotEmpty(reqVO.getNotifyUrl())) {
             reqMap.put("notify_url", reqVO.getNotifyUrl());
         }
+        if (ObjectUtil.isNotEmpty(reqVO.getSubMchId())) {
+            reqMap.put("sub_mch_id", reqVO.getSubMchId());
+        }
         String sign = null;
         try {
             sign = WXPayUtil.generateSignature(reqMap, config.getKey());
@@ -387,15 +444,19 @@ public class WxPaymentUtil {
      * 退款查询
      *
      * @param outTradeNo 订单号
+     * @param subMchId   子商户号
      * @param config     微信支付配置参数
      * @return 成功:返回状态枚举 失败:抛出异常
      */
-    public static WxRefundEnum refundquery(String outTradeNo, WXPayConfig config) {
+    public static WxRefundEnum refundquery(String outTradeNo, String subMchId, WXPayConfig config) {
         Map<String, String> reqMap = new TreeMap<>();
         WXPay wxPay = new WXPay(config);
         reqMap.put("nonce_str", WXPayUtil.generateNonceStr());
         // 必填项
         reqMap.put("out_trade_no", outTradeNo);
+        if (ObjectUtil.isNotEmpty(subMchId)) {
+            reqMap.put("sub_mch_id", subMchId);
+        }
         String sign = null;
         try {
             sign = WXPayUtil.generateSignature(reqMap, config.getKey());
@@ -480,6 +541,5 @@ public class WxPaymentUtil {
         log.info(HEAD + "微信支付回调,返回:{}", JSON.toJSONString(wxOrderRespVO));
         return wxOrderRespVO;
     }
-
 
 }

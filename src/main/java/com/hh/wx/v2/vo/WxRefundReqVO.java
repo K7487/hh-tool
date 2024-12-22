@@ -58,4 +58,8 @@ public class WxRefundReqVO {
 	 */
 	private String notifyUrl;
 
+	/**
+	 * 子商户号
+	 */
+	private String subMchId;
 }

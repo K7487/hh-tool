@@ -130,10 +130,10 @@ public class AliPayProductImpl implements PayProduct {
     }
 
     @Override
-    public AliPayEnum orderquery(String orderNo) {
+    public AliPayEnum orderquery(PayReqVO reqVO) {
         AliPayEnum aliPayEnum = null;
         try {
-            aliPayEnum = AliPayUtil.orderquery(orderNo, config);
+            aliPayEnum = AliPayUtil.orderquery(reqVO.getOrderNo(), config);
             log.info(HEAD + "查询订单成功:{}", JSON.toJSONString(aliPayEnum));
         } catch (Exception e) {
             log.error(HEAD + "查询订单失败：", e);
@@ -143,14 +143,27 @@ public class AliPayProductImpl implements PayProduct {
     }
 
     @Override
-    public Boolean closeorder(String orderNo) {
+    public Boolean closeorder(PayReqVO reqVO) {
         Boolean b = null;
         try {
-            b = AliPayUtil.closeorder(orderNo, config);
+            b = AliPayUtil.closeorder(reqVO.getOrderNo(), config);
             log.info(HEAD + "关闭订单:{}", b);
         } catch (Exception e) {
             log.error(HEAD + "关闭订单失败：", e);
             throw new RuntimeException(HEAD + "关闭订单失败:{}" + e.getMessage());
+        }
+        return b;
+    }
+
+    @Override
+    public Boolean reverse(PayReqVO reqVO) {
+        Boolean b = null;
+        try {
+            b = AliPayUtil.closeorder(reqVO.getOrderNo(), config);
+            log.info(HEAD + "撤销订单:{}", b);
+        } catch (Exception e) {
+            log.error(HEAD + "撤销订单失败：", e);
+            throw new RuntimeException(HEAD + "撤销订单失败:{}" + e.getMessage());
         }
         return b;
     }
@@ -175,10 +188,10 @@ public class AliPayProductImpl implements PayProduct {
     }
 
     @Override
-    public AliRefundEnum refundquery(String orderNo) {
+    public AliRefundEnum refundquery(RefundReqVO reqVO) {
         AliRefundEnum aliRefundEnum = null;
         try {
-            aliRefundEnum = AliPayUtil.refundquery(orderNo, config);
+            aliRefundEnum = AliPayUtil.refundquery(reqVO.getOrderNo(), config);
             log.info(HEAD + "查询退款订单:{}", JSON.toJSONString(aliRefundEnum));
         } catch (Exception e) {
             log.error(HEAD + "查询退款订单失败：", e);
