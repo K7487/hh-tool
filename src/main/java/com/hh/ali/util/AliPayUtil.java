@@ -21,6 +21,8 @@ import com.hh.ali.enums.AliRefundEnum;
 import com.hh.ali.vo.req.AliRefundReqVO;
 import com.hh.ali.vo.resp.AliOrderRespVO;
 import com.hh.constants.Pay;
+import com.hh.factory.vo.req.PayReqVO;
+import com.hh.factory.vo.req.RefundReqVO;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -37,9 +39,9 @@ public class AliPayUtil {
     /**
      * 支付宝统一下单
      * 小程序下单
-     * @param model
-     * @param config
-     * @param request
+     * @param model 订单信息
+     * @param config 支付宝配置
+     * @param request 请求
      * @return 成功:返回参数支付宝交易号 失败:抛出异常
      */
     public static String unifiedorder(AlipayTradeCreateModel model, AlipayConfig config, AlipayTradeCreateRequest request) {
@@ -193,11 +195,11 @@ public class AliPayUtil {
     /**
      * 查询订单状态
      *
-     * @param orderNo 订单号
+     * @param reqVO 请求参数
      * @param config  支付宝支付配置参数
      * @return 成功:返回状态枚举 失败:抛出异常
      */
-    public static AliPayEnum orderquery(String orderNo, AlipayConfig config) {
+    public static AliPayEnum orderquery(PayReqVO reqVO, AlipayConfig config) {
         AlipayClient alipayClient = null;
         try {
             alipayClient = new DefaultAlipayClient(config);
@@ -206,8 +208,11 @@ public class AliPayUtil {
         }
         AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
         JSONObject bizContent = new JSONObject();
-        bizContent.put("out_trade_no", orderNo);
+        bizContent.put("out_trade_no", reqVO.getOrderNo());
         request.setBizContent(bizContent.toString());
+        if (ObjectUtil.isNotEmpty(reqVO.getSubAuthToken())) {
+            request.putOtherTextParam("app_auth_token", reqVO.getSubAuthToken());
+        }
         AlipayTradeQueryResponse response = null;
         try {
             log.info(HEAD + "查询订单状态,入参:{}", JSON.toJSONString(request));
@@ -227,11 +232,11 @@ public class AliPayUtil {
     /**
      * 关闭订单
      *
-     * @param orderNo 订单号
+     * @param reqVO 请求参数
      * @param config  支付宝支付配置参数
      * @return 成功:返回true 失败:抛出异常
      */
-    public static Boolean closeorder(String orderNo, AlipayConfig config) {
+    public static Boolean closeorder(PayReqVO reqVO, AlipayConfig config) {
         AlipayClient alipayClient = null;
         try {
             alipayClient = new DefaultAlipayClient(config);
@@ -240,8 +245,11 @@ public class AliPayUtil {
         }
         AlipayTradeCloseRequest request = new AlipayTradeCloseRequest();
         JSONObject bizContent = new JSONObject();
-        bizContent.put("out_trade_no", orderNo);
+        bizContent.put("out_trade_no", reqVO.getOrderNo());
         request.setBizContent(bizContent.toString());
+        if (ObjectUtil.isNotEmpty(reqVO.getSubAuthToken())) {
+            request.putOtherTextParam("app_auth_token", reqVO.getSubAuthToken());
+        }
         AlipayTradeCloseResponse response = null;
         try {
             log.info(HEAD + "关闭订单,入参:{}", JSON.toJSONString(request));
@@ -279,6 +287,9 @@ public class AliPayUtil {
             bizContent.put("out_request_no", reqVO.getOutRequestNo());
         }
         request.setBizContent(bizContent.toString());
+        if (ObjectUtil.isNotEmpty(reqVO.getSubAuthToken())) {
+            request.putOtherTextParam("app_auth_token", reqVO.getSubAuthToken());
+        }
         AlipayTradeRefundResponse response = null;
         try {
             log.info(HEAD + "申请退款,入参:{}", JSON.toJSONString(request));
@@ -296,11 +307,11 @@ public class AliPayUtil {
     /**
      * 退款查询
      *
-     * @param orderNo 订单号
+     * @param reqVO 请求参数
      * @param config  微信支付配置参数
      * @return 成功:返回状态枚举 失败:抛出异常
      */
-    public static AliRefundEnum refundquery(String orderNo, AlipayConfig config) {
+    public static AliRefundEnum refundquery(RefundReqVO reqVO, AlipayConfig config) {
         AlipayClient alipayClient = null;
         try {
             alipayClient = new DefaultAlipayClient(config);
@@ -309,9 +320,16 @@ public class AliPayUtil {
         }
         AlipayTradeFastpayRefundQueryRequest request = new AlipayTradeFastpayRefundQueryRequest();
         JSONObject bizContent = new JSONObject();
-        bizContent.put("out_request_no", orderNo);
-        bizContent.put("out_trade_no", orderNo);
+        bizContent.put("out_trade_no", reqVO.getOrderNo());
+        if (ObjectUtil.isNotEmpty(reqVO.getOutRequestNo())) {
+            bizContent.put("out_request_no", reqVO.getOutRequestNo());
+        } else {
+            bizContent.put("out_request_no", reqVO.getOrderNo());
+        }
         request.setBizContent(bizContent.toString());
+        if (ObjectUtil.isNotEmpty(reqVO.getSubAuthToken())) {
+            request.putOtherTextParam("app_auth_token", reqVO.getSubAuthToken());
+        }
         AlipayTradeFastpayRefundQueryResponse response = null;
         try {
             log.info(HEAD + "退款查询,入参:{}", JSON.toJSONString(request));

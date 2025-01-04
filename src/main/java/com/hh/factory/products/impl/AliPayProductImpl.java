@@ -40,92 +40,111 @@ public class AliPayProductImpl implements PayProduct {
         String tradeType = orderCheck.placeOrderIsNull(reqVO, PayType.ZFB);
         String tradeNo = null;
         switch (tradeType) {
-            case "JSAPI_PAY":
-                AlipayTradeCreateModel model1 = new AlipayTradeCreateModel();
-                AlipayTradeCreateRequest request1 = new AlipayTradeCreateRequest();
-                model1.setOutTradeNo(reqVO.getOrderNo());
-                model1.setTotalAmount(reqVO.getAmounts().toString());
-                model1.setSubject(reqVO.getDescription());
-                model1.setProductCode(tradeType);
-                model1.setOpAppId(config.getOpAppId());
-                model1.setBuyerId(reqVO.getOpenid());
-                request1.setNotifyUrl(config.getNotifyUrl());
+            case "JSAPI_PAY" -> {
+                AlipayTradeCreateModel model = new AlipayTradeCreateModel();
+                AlipayTradeCreateRequest request = new AlipayTradeCreateRequest();
+                model.setOutTradeNo(reqVO.getOrderNo());
+                model.setTotalAmount(reqVO.getAmounts().toString());
+                model.setSubject(reqVO.getDescription());
+                model.setProductCode(tradeType);
+                model.setOpAppId(config.getOpAppId());
+                model.setBuyerId(reqVO.getOpenid());
+                request.setNotifyUrl(config.getNotifyUrl());
+                if (ObjectUtil.isNotEmpty(reqVO.getSubAuthToken())) {
+                    request.putOtherTextParam("app_auth_token", reqVO.getSubAuthToken());
+                }
                 try {
-                    tradeNo = AliPayUtil.unifiedorder(model1, config, request1);
+                    tradeNo = AliPayUtil.unifiedorder(model, config, request);
                     log.info(HEAD + "下单成功:{}", tradeNo);
                 } catch (Exception e) {
                     log.error(HEAD + "下单失败：", e);
                     throw new RuntimeException(HEAD + "下单失败:{}" + e.getMessage());
                 }
                 return tradeNo;
-            case "QUICK_WAP_WAY":
-                AlipayTradeWapPayModel model4 = new AlipayTradeWapPayModel();
-                AlipayTradeWapPayRequest request4 = new AlipayTradeWapPayRequest();
-                model4.setOutTradeNo(reqVO.getOrderNo());
-                model4.setTotalAmount(reqVO.getAmounts().toString());
-                model4.setSubject(reqVO.getDescription());
-                model4.setProductCode(tradeType);
-                request4.setNotifyUrl(config.getNotifyUrl());
+            }
+            case "QUICK_WAP_WAY" -> {
+                AlipayTradeWapPayModel model = new AlipayTradeWapPayModel();
+                AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
+                model.setOutTradeNo(reqVO.getOrderNo());
+                model.setTotalAmount(reqVO.getAmounts().toString());
+                model.setSubject(reqVO.getDescription());
+                model.setProductCode(tradeType);
+                request.setNotifyUrl(config.getNotifyUrl());
+                if (ObjectUtil.isNotEmpty(reqVO.getSubAuthToken())) {
+                    request.putOtherTextParam("app_auth_token", reqVO.getSubAuthToken());
+                }
                 try {
-                    tradeNo = AliPayUtil.unifiedorder(model4, config, request4);
+                    tradeNo = AliPayUtil.unifiedorder(model, config, request);
                     log.info(HEAD + "下单成功:{}", tradeNo);
                 } catch (Exception e) {
                     log.error(HEAD + "下单失败：", e);
                     throw new RuntimeException(HEAD + "下单失败:{}" + e.getMessage());
                 }
                 return tradeNo;
-            case "QUICK_MSECURITY_PAY":
-                AlipayTradeAppPayModel model3 = new AlipayTradeAppPayModel();
-                AlipayTradeAppPayRequest request3 = new AlipayTradeAppPayRequest();
-                model3.setOutTradeNo(reqVO.getOrderNo());
-                model3.setTotalAmount(reqVO.getAmounts().toString());
-                model3.setSubject(reqVO.getDescription());
-                model3.setProductCode(tradeType);
-                request3.setNotifyUrl(config.getNotifyUrl());
-                request3.setBizModel(model3);
+            }
+            case "QUICK_MSECURITY_PAY" -> {
+                AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
+                AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
+                model.setOutTradeNo(reqVO.getOrderNo());
+                model.setTotalAmount(reqVO.getAmounts().toString());
+                model.setSubject(reqVO.getDescription());
+                model.setProductCode(tradeType);
+                request.setNotifyUrl(config.getNotifyUrl());
+                request.setBizModel(model);
+                if (ObjectUtil.isNotEmpty(reqVO.getSubAuthToken())) {
+                    request.putOtherTextParam("app_auth_token", reqVO.getSubAuthToken());
+                }
                 try {
-                    tradeNo = AliPayUtil.unifiedorder(model3, config, request3);
+                    tradeNo = AliPayUtil.unifiedorder(model, config, request);
                     log.info(HEAD + "下单成功:{}", tradeNo);
                 } catch (Exception e) {
                     log.error(HEAD + "下单失败：", e);
                     throw new RuntimeException(HEAD + "下单失败:{}" + e.getMessage());
                 }
                 return tradeNo;
-            case "FAST_INSTANT_TRADE_PAY":
-                AlipayTradePagePayModel model2 = new AlipayTradePagePayModel();
-                AlipayTradePagePayRequest request2 = new AlipayTradePagePayRequest();
-                model2.setOutTradeNo(reqVO.getOrderNo());
-                model2.setTotalAmount(reqVO.getAmounts().toString());
-                model2.setSubject(reqVO.getDescription());
-                model2.setProductCode(tradeType);
-                request2.setNotifyUrl(config.getNotifyUrl());
+            }
+            case "FAST_INSTANT_TRADE_PAY" -> {
+                AlipayTradePagePayModel model = new AlipayTradePagePayModel();
+                AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
+                model.setOutTradeNo(reqVO.getOrderNo());
+                model.setTotalAmount(reqVO.getAmounts().toString());
+                model.setSubject(reqVO.getDescription());
+                model.setProductCode(tradeType);
+                request.setNotifyUrl(config.getNotifyUrl());
+                if (ObjectUtil.isNotEmpty(reqVO.getSubAuthToken())) {
+                    request.putOtherTextParam("app_auth_token", reqVO.getSubAuthToken());
+                }
                 try {
-                    tradeNo = AliPayUtil.unifiedorder(model2, config, request2);
+                    tradeNo = AliPayUtil.unifiedorder(model, config, request);
                     log.info(HEAD + "下单成功:{}", tradeNo);
                 } catch (Exception e) {
                     log.error(HEAD + "下单失败：", e);
                     throw new RuntimeException(HEAD + "下单失败:{}" + e.getMessage());
                 }
                 return tradeNo;
-            case "MICROPAY":
-                AlipayTradePayModel model5 = new AlipayTradePayModel();
-                AlipayTradePayRequest request5 = new AlipayTradePayRequest();
-                model5.setOutTradeNo(reqVO.getOrderNo());
-                model5.setTotalAmount(reqVO.getAmounts().toString());
-                model5.setSubject(reqVO.getDescription());
-                model5.setAuthCode(reqVO.getAuthCode());
-                model5.setScene("bar_code");
-                request5.setNotifyUrl(config.getNotifyUrl());
+            }
+            case "MICROPAY" -> {
+                AlipayTradePayModel model = new AlipayTradePayModel();
+                AlipayTradePayRequest request = new AlipayTradePayRequest();
+                model.setOutTradeNo(reqVO.getOrderNo());
+                model.setTotalAmount(reqVO.getAmounts().toString());
+                model.setSubject(reqVO.getDescription());
+                model.setAuthCode(reqVO.getAuthCode());
+                model.setScene("bar_code");
+                request.setNotifyUrl(config.getNotifyUrl());
+                if (ObjectUtil.isNotEmpty(reqVO.getSubAuthToken())) {
+                    request.putOtherTextParam("app_auth_token", reqVO.getSubAuthToken());
+                }
                 try {
-                    tradeNo = AliPayUtil.unifiedorder(model5, config, request5);
+                    tradeNo = AliPayUtil.unifiedorder(model, config, request);
                     log.info(HEAD + "下单成功:{}", tradeNo);
                 } catch (Exception e) {
                     log.error(HEAD + "下单失败：", e);
                     throw new RuntimeException(HEAD + "下单失败:{}" + e.getMessage());
                 }
                 return tradeNo;
-            default:
-                throw new RuntimeException("支付类型有误");
+            }
+            default -> throw new RuntimeException("支付类型有误");
         }
     }
 
@@ -133,7 +152,7 @@ public class AliPayProductImpl implements PayProduct {
     public AliPayEnum orderquery(PayReqVO reqVO) {
         AliPayEnum aliPayEnum = null;
         try {
-            aliPayEnum = AliPayUtil.orderquery(reqVO.getOrderNo(), config);
+            aliPayEnum = AliPayUtil.orderquery(reqVO, config);
             log.info(HEAD + "查询订单成功:{}", JSON.toJSONString(aliPayEnum));
         } catch (Exception e) {
             log.error(HEAD + "查询订单失败：", e);
@@ -146,7 +165,7 @@ public class AliPayProductImpl implements PayProduct {
     public Boolean closeorder(PayReqVO reqVO) {
         Boolean b = null;
         try {
-            b = AliPayUtil.closeorder(reqVO.getOrderNo(), config);
+            b = AliPayUtil.closeorder(reqVO, config);
             log.info(HEAD + "关闭订单:{}", b);
         } catch (Exception e) {
             log.error(HEAD + "关闭订单失败：", e);
@@ -157,15 +176,7 @@ public class AliPayProductImpl implements PayProduct {
 
     @Override
     public Boolean reverse(PayReqVO reqVO) {
-        Boolean b = null;
-        try {
-            b = AliPayUtil.closeorder(reqVO.getOrderNo(), config);
-            log.info(HEAD + "撤销订单:{}", b);
-        } catch (Exception e) {
-            log.error(HEAD + "撤销订单失败：", e);
-            throw new RuntimeException(HEAD + "撤销订单失败:{}" + e.getMessage());
-        }
-        return b;
+        throw new RuntimeException("支付宝不支持");
     }
 
     @Override
@@ -175,6 +186,9 @@ public class AliPayProductImpl implements PayProduct {
         aliRefundReqVO.setRefundAmount(reqVO.getRefundFee());
         if (ObjectUtil.isNotEmpty(reqVO.getOutRequestNo())) {
             aliRefundReqVO.setOutRequestNo(reqVO.getOutRequestNo());
+        }
+        if (ObjectUtil.isNotEmpty(reqVO.getSubAuthToken())) {
+            aliRefundReqVO.setSubAuthToken(reqVO.getSubAuthToken());
         }
         Boolean b = null;
         try {
@@ -191,7 +205,7 @@ public class AliPayProductImpl implements PayProduct {
     public AliRefundEnum refundquery(RefundReqVO reqVO) {
         AliRefundEnum aliRefundEnum = null;
         try {
-            aliRefundEnum = AliPayUtil.refundquery(reqVO.getOrderNo(), config);
+            aliRefundEnum = AliPayUtil.refundquery(reqVO, config);
             log.info(HEAD + "查询退款订单:{}", JSON.toJSONString(aliRefundEnum));
         } catch (Exception e) {
             log.error(HEAD + "查询退款订单失败：", e);

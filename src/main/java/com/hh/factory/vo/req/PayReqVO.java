@@ -58,4 +58,9 @@ public class PayReqVO {
      * 子商户号
      */
     private String subMchId;
+
+    /**
+     * 子商户授权token
+     */
+    private String subAuthToken;
 }

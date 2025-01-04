@@ -25,6 +25,11 @@ public class AliRefundReqVO {
 	private String orderNo;
 
 	/**
+	 * 子商户授权token
+	 */
+	private String subAuthToken;
+
+	/**
 	 * 退款金额(单位：元)
 	 * 保留两位小数
 	 */

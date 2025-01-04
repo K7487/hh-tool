@@ -23,6 +23,11 @@ public class RefundReqVO {
     private String orderNo;
 
     /**
+     * 子商户授权token
+     */
+    private String subAuthToken;
+
+    /**
      * 退款金额,单位元（保留2位小数）
      */
     private BigDecimal refundFee;
