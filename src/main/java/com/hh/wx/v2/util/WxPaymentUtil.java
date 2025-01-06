@@ -228,16 +228,24 @@ public class WxPaymentUtil {
         log.info(HEAD + "统一下单,付款码支付,出参:{}", JSON.toJSONString(resqMap));
         String return_code = resqMap.get("return_code");
         if ("SUCCESS".equals(return_code)) {
-            if ("USERPAYING".equals(resqMap.get("err_code"))) {
-                Map<String, String> respMap = new HashMap<>();
-                respMap.put("msg", "支付中");
-                log.info(HEAD + "统一下单,付款码支付,返回的结果:{}", JSON.toJSONString(respMap));
-                return respMap;
-            } else {
-                throw new RuntimeException(resqMap.get("err_code_des"));
+            String result_code = resqMap.get("result_code");
+            if (!"SUCCESS".equals(result_code)) {
+                if ("USERPAYING".equals(resqMap.get("err_code"))) {
+                    Map<String, String> respMap = new HashMap<>();
+                    respMap.put("msg", "支付中");
+                    log.info(HEAD + "统一下单,付款码支付,返回的结果:{}", JSON.toJSONString(respMap));
+                    return respMap;
+                } else {
+                    throw new RuntimeException(resqMap.get("err_code_des"));
+                }
             }
+            Map<String, String> respMap = new HashMap<>();
+            respMap.put("msg", "支付成功");
+            log.info(HEAD + "统一下单,付款码支付,返回的结果:{}", JSON.toJSONString(respMap));
+            return respMap;
         } else {
-            throw new RuntimeException(resqMap.get("return_msg"));
+            String msg = resqMap.get("return_msg").toString();
+            throw new RuntimeException(msg);
         }
     }
 
