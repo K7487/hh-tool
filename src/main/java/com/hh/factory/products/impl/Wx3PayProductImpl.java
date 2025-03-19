@@ -2,6 +2,7 @@ package com.hh.factory.products.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson2.JSON;
+import com.github.wxpay.sdk.WXPayConfig;
 import com.hh.constants.Pay;
 import com.hh.factory.products.PayProduct;
 import com.hh.factory.vo.req.PayReqVO;
@@ -11,6 +12,7 @@ import com.hh.wx.v2.config.WxConfig;
 import com.hh.wx.v2.enums.WxPayEnum;
 import com.hh.wx.v2.enums.WxRefundEnum;
 import com.hh.wx.v2.util.WxPaymentUtil;
+import com.hh.wx.v3.constant.Wx3ConfigConstant;
 import com.hh.wx.v3.constant.Wx3Constant;
 import com.hh.wx.v3.products.Wx3AppService;
 import com.hh.wx.v3.products.Wx3H5Service;
@@ -29,6 +31,7 @@ import com.wechat.pay.java.service.refund.model.QueryByOutRefundNoRequest;
 import com.wechat.pay.java.service.refund.model.Refund;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,30 +63,43 @@ public class Wx3PayProductImpl implements PayProduct {
 
     @Override
     public Map<String, String> placeOrder(PayReqVO reqVO) {
+        return getPlaceOrder(reqVO, null);
+    }
+
+    @Override
+    public Map<String, String> placeOrder(PayReqVO reqVO, Object cfg) {
+        Wx3ConfigConstant wx3ConfigConstant = null;
+        if (ObjectUtil.isNotEmpty(cfg)) {
+            wx3ConfigConstant = (Wx3ConfigConstant) cfg;
+        }
+        return getPlaceOrder(reqVO, wx3ConfigConstant);
+    }
+
+    private Map<String, String> getPlaceOrder(PayReqVO reqVO, Wx3ConfigConstant wx3ConfigConstant) {
         switch (reqVO.getTradeType()) {
             case Pay.TradeType.JSAPI:
                 if (ObjectUtil.isEmpty(reqVO.getSubMchId())) {
-                    return wx3JsapiService.placeOrder(reqVO);
+                    return wx3JsapiService.placeOrder(reqVO, wx3ConfigConstant);
                 } else {
-                    return wx3SpJsapiService.placeOrder(reqVO);
+                    return wx3SpJsapiService.placeOrder(reqVO, wx3ConfigConstant);
                 }
             case Pay.TradeType.NATIVE:
                 if (ObjectUtil.isEmpty(reqVO.getSubMchId())) {
-                    return nativePayService.placeOrder(reqVO);
+                    return nativePayService.placeOrder(reqVO, wx3ConfigConstant);
                 } else {
-                    return wx3SpNativePayService.placeOrder(reqVO);
+                    return wx3SpNativePayService.placeOrder(reqVO, wx3ConfigConstant);
                 }
             case Pay.TradeType.APP:
                 if (ObjectUtil.isEmpty(reqVO.getSubMchId())) {
-                    return wx3AppService.placeOrder(reqVO);
+                    return wx3AppService.placeOrder(reqVO, wx3ConfigConstant);
                 } else {
-                    return wx3SpAppService.placeOrder(reqVO);
+                    return wx3SpAppService.placeOrder(reqVO, wx3ConfigConstant);
                 }
             case Pay.TradeType.MWEB:
                 if (ObjectUtil.isEmpty(reqVO.getSubMchId())) {
-                    return wx3H5Service.placeOrder(reqVO);
+                    return wx3H5Service.placeOrder(reqVO, wx3ConfigConstant);
                 } else {
-                    return wx3SpH5Service.placeOrder(reqVO);
+                    return wx3SpH5Service.placeOrder(reqVO, wx3ConfigConstant);
                 }
             default:
                 throw new RuntimeException("支付类型有误");
@@ -92,6 +108,21 @@ public class Wx3PayProductImpl implements PayProduct {
 
     @Override
     public WxPayEnum orderquery(PayReqVO reqVO) {
+        return getOrderquery(reqVO, wxConfig);
+    }
+
+    @Override
+    public WxPayEnum orderquery(PayReqVO reqVO, Object cfg) {
+        WXPayConfig wxPayConfig;
+        if (ObjectUtil.isNotEmpty(cfg)) {
+            wxPayConfig = (WXPayConfig) cfg;
+        } else {
+            wxPayConfig = wxConfig;
+        }
+        return getOrderquery(reqVO, wxPayConfig);
+    }
+
+    private WxPayEnum getOrderquery(PayReqVO reqVO, WXPayConfig wxConfig) {
         WxPayEnum wxPayEnum = null;
         if (ObjectUtil.isEmpty(reqVO.getOrderNo())) {
             throw new RuntimeException(HEAD + "订单号不能为空");
@@ -108,12 +139,27 @@ public class Wx3PayProductImpl implements PayProduct {
 
     @Override
     public Boolean closeorder(PayReqVO reqVO) {
+        return getCloseorder(reqVO, wxConfig);
+    }
+
+    @Override
+    public Boolean closeorder(PayReqVO reqVO, Object cfg) {
+        WXPayConfig wxPayConfig;
+        if (ObjectUtil.isNotEmpty(cfg)) {
+            wxPayConfig = (WXPayConfig) cfg;
+        } else {
+            wxPayConfig = wxConfig;
+        }
+        return getCloseorder(reqVO, wxPayConfig);
+    }
+
+    private Boolean getCloseorder(PayReqVO reqVO, WXPayConfig wxPayConfig) {
         Boolean close = null;
         if (ObjectUtil.isEmpty(reqVO.getOrderNo())) {
             throw new RuntimeException(HEAD + "订单号不能为空");
         }
         try {
-            close = WxPaymentUtil.closeorder(reqVO.getOrderNo(), reqVO.getSubMchId(), wxConfig);
+            close = WxPaymentUtil.closeorder(reqVO.getOrderNo(), reqVO.getSubMchId(), wxPayConfig);
             log.info(HEAD + "关闭订单:{}", close);
         } catch (Exception e) {
             log.error(HEAD + "关闭订单失败:", e);
@@ -124,12 +170,27 @@ public class Wx3PayProductImpl implements PayProduct {
 
     @Override
     public Boolean reverse(PayReqVO reqVO) {
+        return getReverse(reqVO, wxConfig);
+    }
+
+    @Override
+    public Boolean reverse(PayReqVO reqVO, Object cfg) {
+        WXPayConfig wxPayConfig;
+        if (ObjectUtil.isNotEmpty(cfg)) {
+            wxPayConfig = (WXPayConfig) cfg;
+        } else {
+            wxPayConfig = wxConfig;
+        }
+        return getReverse(reqVO, wxPayConfig);
+    }
+
+    private Boolean getReverse(PayReqVO reqVO, WXPayConfig wxPayConfig) {
         Boolean close = null;
         if (ObjectUtil.isEmpty(reqVO.getOrderNo())) {
             throw new RuntimeException(HEAD + "订单号不能为空");
         }
         try {
-            close = WxPaymentUtil.reverse(reqVO.getOrderNo(), reqVO.getSubMchId(), wxConfig);
+            close = WxPaymentUtil.reverse(reqVO.getOrderNo(), reqVO.getSubMchId(), wxPayConfig);
             log.info(HEAD + "关闭订单:{}", close);
         } catch (Exception e) {
             log.error(HEAD + "关闭订单失败:", e);
@@ -140,12 +201,6 @@ public class Wx3PayProductImpl implements PayProduct {
 
     @Override
     public Boolean refund(RefundReqVO reqVO) {
-        if (ObjectUtil.isEmpty(reqVO.getOrderNo())) {
-            throw new RuntimeException("订单号不能为空");
-        }
-        if (ObjectUtil.isEmpty(reqVO.getRefundFee())) {
-            throw new RuntimeException("退款金额不能为空");
-        }
         Config config = new RSAAutoCertificateConfig.Builder()
                 .merchantId(wx3Constant.getMerchantId())
                 .privateKeyFromPath(wx3Constant.getPrivateKeyPath())
@@ -153,6 +208,49 @@ public class Wx3PayProductImpl implements PayProduct {
                 .apiV3Key(wx3Constant.getApiV3Key())
                 .build();
         RefundService service = new RefundService.Builder().config(config).build();
+        return getRefund(reqVO, service);
+    }
+
+
+    @Override
+    public Boolean refund(RefundReqVO reqVO, Object cfg) {
+        Wx3ConfigConstant wx3ConfigConstant = null;
+        if (ObjectUtil.isNotEmpty(cfg)) {
+            wx3ConfigConstant = (Wx3ConfigConstant) cfg;
+        }
+        Config config;
+        if (ObjectUtil.isNotEmpty(wx3ConfigConstant)) {
+            config = new RSAAutoCertificateConfig.Builder()
+                    .merchantId(wx3Constant.getMerchantId())
+                    .privateKeyFromPath(wx3Constant.getPrivateKeyPath())
+                    .merchantSerialNumber(wx3Constant.getMerchantSerialNumber())
+                    .apiV3Key(wx3Constant.getApiV3Key())
+                    .build();
+        } else {
+            config = new RSAAutoCertificateConfig.Builder()
+                    .merchantId(wx3Constant.getMerchantId())
+                    .privateKeyFromPath(wx3Constant.getPrivateKeyPath())
+                    .merchantSerialNumber(wx3Constant.getMerchantSerialNumber())
+                    .apiV3Key(wx3Constant.getApiV3Key())
+                    .build();
+        }
+        RefundService service = new RefundService.Builder().config(config).build();
+        return getRefund(reqVO, service);
+    }
+
+    private Boolean getRefund(RefundReqVO reqVO, RefundService service) {
+        String notifyUrl;
+        if (ObjectUtil.isNotEmpty(reqVO.getNotifyUrl())) {
+            notifyUrl = reqVO.getNotifyUrl();
+        } else {
+            notifyUrl = wx3Constant.getNotifyUrl();
+        }
+        if (ObjectUtil.isEmpty(reqVO.getOrderNo())) {
+            throw new RuntimeException("订单号不能为空");
+        }
+        if (ObjectUtil.isEmpty(reqVO.getRefundFee())) {
+            throw new RuntimeException("退款金额不能为空");
+        }
         CreateRequest request = new CreateRequest();
         request.setOutTradeNo(reqVO.getOrderNo());
         request.setOutRefundNo(reqVO.getOrderNo());
@@ -161,7 +259,7 @@ public class Wx3PayProductImpl implements PayProduct {
         amountReq.setTotal(refundFee);
         amountReq.setRefund(refundFee);
         request.setAmount(amountReq);
-        request.setNotifyUrl(wx3Constant.getNotifyUrl());
+        request.setNotifyUrl(notifyUrl);
         request.setSubMchid(reqVO.getSubMchId());
         log.info(HEAD + "申请退款,入参:{}", JSON.toJSONString(request));
         Refund refund = service.create(request);
@@ -176,15 +274,44 @@ public class Wx3PayProductImpl implements PayProduct {
 
     @Override
     public WxRefundEnum refundquery(RefundReqVO reqVO) {
-        if (ObjectUtil.isEmpty(reqVO.getOrderNo())) {
-            throw new RuntimeException("订单号不能为空");
-        }
         Config config = new RSAAutoCertificateConfig.Builder()
                 .merchantId(wx3Constant.getMerchantId())
                 .privateKeyFromPath(wx3Constant.getPrivateKeyPath())
                 .merchantSerialNumber(wx3Constant.getMerchantSerialNumber())
                 .apiV3Key(wx3Constant.getApiV3Key())
                 .build();
+        return getRefundquery(reqVO, config);
+    }
+
+    @Override
+    public WxRefundEnum refundquery(RefundReqVO reqVO, Object cfg) {
+        Wx3ConfigConstant wx3ConfigConstant = null;
+        if (ObjectUtil.isNotEmpty(cfg)) {
+            wx3ConfigConstant = (Wx3ConfigConstant) cfg;
+        }
+        Config config;
+        if (ObjectUtil.isNotEmpty(wx3ConfigConstant)) {
+            config = new RSAAutoCertificateConfig.Builder()
+                    .merchantId(wx3Constant.getMerchantId())
+                    .privateKeyFromPath(wx3Constant.getPrivateKeyPath())
+                    .merchantSerialNumber(wx3Constant.getMerchantSerialNumber())
+                    .apiV3Key(wx3Constant.getApiV3Key())
+                    .build();
+        } else {
+            config = new RSAAutoCertificateConfig.Builder()
+                    .merchantId(wx3Constant.getMerchantId())
+                    .privateKeyFromPath(wx3Constant.getPrivateKeyPath())
+                    .merchantSerialNumber(wx3Constant.getMerchantSerialNumber())
+                    .apiV3Key(wx3Constant.getApiV3Key())
+                    .build();
+        }
+        return getRefundquery(reqVO, config);
+    }
+
+    private WxRefundEnum getRefundquery(RefundReqVO reqVO, Config config) {
+        if (ObjectUtil.isEmpty(reqVO.getOrderNo())) {
+            throw new RuntimeException("订单号不能为空");
+        }
         RefundService service = new RefundService.Builder().config(config).build();
         QueryByOutRefundNoRequest request = new QueryByOutRefundNoRequest();
         request.setOutRefundNo(reqVO.getOrderNo());
@@ -208,5 +335,27 @@ public class Wx3PayProductImpl implements PayProduct {
         return wxOrderRespVO;
     }
 
+    @Override
+    public WxOrderRespVO callback(HttpServletRequest request, Object cfg) {
+        WXPayConfig wxPayConfig;
+        if (ObjectUtil.isNotEmpty(cfg)) {
+            wxPayConfig = (WXPayConfig) cfg;
+        } else {
+            wxPayConfig = wxConfig;
+        }
+        return getCallback(request, wxPayConfig, log, HEAD);
+    }
+
+    static WxOrderRespVO getCallback(HttpServletRequest request, WXPayConfig wxPayConfig, Logger log, String head) {
+        WxOrderRespVO wxOrderRespVO = null;
+        try {
+            wxOrderRespVO = WxPaymentUtil.callback(request, wxPayConfig);
+            log.info(head + "回调:{}", JSON.toJSONString(wxOrderRespVO));
+        } catch (Exception e) {
+            log.error(head + "回调失败:", e);
+            throw new RuntimeException(head + "回调失败:" + e.getMessage());
+        }
+        return wxOrderRespVO;
+    }
 
 }

@@ -46,4 +46,9 @@ public class RefundReqVO {
      * 子商户号
      */
     private String subMchId;
+
+    /**
+     * 回调地址
+     */
+    private String notifyUrl;
 }

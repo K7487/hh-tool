@@ -2,6 +2,7 @@ package com.hh.factory.products;
 
 
 import com.hh.factory.vo.req.PayReqVO;
+import com.hh.wx.v3.constant.Wx3ConfigConstant;
 
 public interface PayV3Product {
     /**
@@ -9,7 +10,7 @@ public interface PayV3Product {
      * @param reqVO
      * @return 返回收银台信息
      */
-    <E> E placeOrder(PayReqVO reqVO);
+    <E> E placeOrder(PayReqVO reqVO, Wx3ConfigConstant cfg);
 
     /**
      * 查询订单

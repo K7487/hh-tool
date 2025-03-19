@@ -2,6 +2,7 @@ package com.hh.factory.products.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson2.JSON;
+import com.alipay.api.AlipayConfig;
 import com.alipay.api.domain.*;
 import com.alipay.api.request.*;
 import com.hh.ali.conig.AliConfig;
@@ -37,6 +38,29 @@ public class AliPayProductImpl implements PayProduct {
 
     @Override
     public String placeOrder(PayReqVO reqVO) {
+        AlipayConfig alipayConfig = config;
+        return getPlaceOrder(reqVO, alipayConfig);
+    }
+
+    @Override
+    public String placeOrder(PayReqVO reqVO, Object cfg) {
+        AlipayConfig alipayConfig;
+        String notifyUrl;
+        if (ObjectUtil.isNotEmpty(cfg)) {
+            alipayConfig = (AlipayConfig) cfg;
+        } else {
+            alipayConfig = config;
+        }
+        return getPlaceOrder(reqVO, alipayConfig);
+    }
+
+    private String getPlaceOrder(PayReqVO reqVO, AlipayConfig alipayConfig) {
+        String notifyUrl;
+        if (ObjectUtil.isNotEmpty(reqVO.getNotifyUrl())) {
+            notifyUrl = reqVO.getNotifyUrl();
+        } else {
+            notifyUrl = config.getNotifyUrl();
+        }
         String tradeType = orderCheck.placeOrderIsNull(reqVO, PayType.ZFB);
         String tradeNo = null;
         switch (tradeType) {
@@ -47,14 +71,14 @@ public class AliPayProductImpl implements PayProduct {
                 model.setTotalAmount(reqVO.getAmounts().toString());
                 model.setSubject(reqVO.getDescription());
                 model.setProductCode(tradeType);
-                model.setOpAppId(config.getOpAppId());
+                model.setOpAppId(reqVO.getOpAppId());
                 model.setBuyerId(reqVO.getOpenid());
-                request.setNotifyUrl(config.getNotifyUrl());
+                request.setNotifyUrl(notifyUrl);
                 if (ObjectUtil.isNotEmpty(reqVO.getSubAuthToken())) {
                     request.putOtherTextParam("app_auth_token", reqVO.getSubAuthToken());
                 }
                 try {
-                    tradeNo = AliPayUtil.unifiedorder(model, config, request);
+                    tradeNo = AliPayUtil.unifiedorder(model, alipayConfig, request);
                     log.info(HEAD + "下单成功:{}", tradeNo);
                 } catch (Exception e) {
                     log.error(HEAD + "下单失败：", e);
@@ -69,12 +93,12 @@ public class AliPayProductImpl implements PayProduct {
                 model.setTotalAmount(reqVO.getAmounts().toString());
                 model.setSubject(reqVO.getDescription());
                 model.setProductCode(tradeType);
-                request.setNotifyUrl(config.getNotifyUrl());
+                request.setNotifyUrl(notifyUrl);
                 if (ObjectUtil.isNotEmpty(reqVO.getSubAuthToken())) {
                     request.putOtherTextParam("app_auth_token", reqVO.getSubAuthToken());
                 }
                 try {
-                    tradeNo = AliPayUtil.unifiedorder(model, config, request);
+                    tradeNo = AliPayUtil.unifiedorder(model, alipayConfig, request);
                     log.info(HEAD + "下单成功:{}", tradeNo);
                 } catch (Exception e) {
                     log.error(HEAD + "下单失败：", e);
@@ -89,13 +113,13 @@ public class AliPayProductImpl implements PayProduct {
                 model.setTotalAmount(reqVO.getAmounts().toString());
                 model.setSubject(reqVO.getDescription());
                 model.setProductCode(tradeType);
-                request.setNotifyUrl(config.getNotifyUrl());
+                request.setNotifyUrl(notifyUrl);
                 request.setBizModel(model);
                 if (ObjectUtil.isNotEmpty(reqVO.getSubAuthToken())) {
                     request.putOtherTextParam("app_auth_token", reqVO.getSubAuthToken());
                 }
                 try {
-                    tradeNo = AliPayUtil.unifiedorder(model, config, request);
+                    tradeNo = AliPayUtil.unifiedorder(model, alipayConfig, request);
                     log.info(HEAD + "下单成功:{}", tradeNo);
                 } catch (Exception e) {
                     log.error(HEAD + "下单失败：", e);
@@ -110,12 +134,12 @@ public class AliPayProductImpl implements PayProduct {
                 model.setTotalAmount(reqVO.getAmounts().toString());
                 model.setSubject(reqVO.getDescription());
                 model.setProductCode(tradeType);
-                request.setNotifyUrl(config.getNotifyUrl());
+                request.setNotifyUrl(notifyUrl);
                 if (ObjectUtil.isNotEmpty(reqVO.getSubAuthToken())) {
                     request.putOtherTextParam("app_auth_token", reqVO.getSubAuthToken());
                 }
                 try {
-                    tradeNo = AliPayUtil.unifiedorder(model, config, request);
+                    tradeNo = AliPayUtil.unifiedorder(model, alipayConfig, request);
                     log.info(HEAD + "下单成功:{}", tradeNo);
                 } catch (Exception e) {
                     log.error(HEAD + "下单失败：", e);
@@ -131,12 +155,12 @@ public class AliPayProductImpl implements PayProduct {
                 model.setSubject(reqVO.getDescription());
                 model.setAuthCode(reqVO.getAuthCode());
                 model.setScene("bar_code");
-                request.setNotifyUrl(config.getNotifyUrl());
+                request.setNotifyUrl(notifyUrl);
                 if (ObjectUtil.isNotEmpty(reqVO.getSubAuthToken())) {
                     request.putOtherTextParam("app_auth_token", reqVO.getSubAuthToken());
                 }
                 try {
-                    tradeNo = AliPayUtil.unifiedorder(model, config, request);
+                    tradeNo = AliPayUtil.unifiedorder(model, alipayConfig, request);
                     log.info(HEAD + "下单成功:{}", tradeNo);
                 } catch (Exception e) {
                     log.error(HEAD + "下单失败：", e);
@@ -150,9 +174,24 @@ public class AliPayProductImpl implements PayProduct {
 
     @Override
     public AliPayEnum orderquery(PayReqVO reqVO) {
+        return getOrderquery(reqVO, config);
+    }
+
+    @Override
+    public AliPayEnum orderquery(PayReqVO reqVO, Object cfg) {
+        AlipayConfig alipayConfig;
+        if (ObjectUtil.isNotEmpty(cfg)) {
+            alipayConfig = (AlipayConfig) cfg;
+        } else {
+            alipayConfig = config;
+        }
+        return getOrderquery(reqVO, alipayConfig);
+    }
+
+    private AliPayEnum getOrderquery(PayReqVO reqVO, AlipayConfig alipayConfig) {
         AliPayEnum aliPayEnum = null;
         try {
-            aliPayEnum = AliPayUtil.orderquery(reqVO, config);
+            aliPayEnum = AliPayUtil.orderquery(reqVO, alipayConfig);
             log.info(HEAD + "查询订单成功:{}", JSON.toJSONString(aliPayEnum));
         } catch (Exception e) {
             log.error(HEAD + "查询订单失败：", e);
@@ -163,6 +202,21 @@ public class AliPayProductImpl implements PayProduct {
 
     @Override
     public Boolean closeorder(PayReqVO reqVO) {
+        return getCloseorder(reqVO, config);
+    }
+
+    @Override
+    public Boolean closeorder(PayReqVO reqVO, Object cfg) {
+        AlipayConfig alipayConfig;
+        if (ObjectUtil.isNotEmpty(cfg)) {
+            alipayConfig = (AlipayConfig) cfg;
+        } else {
+            alipayConfig = config;
+        }
+        return getCloseorder(reqVO, alipayConfig);
+    }
+
+    private Boolean getCloseorder(PayReqVO reqVO, AlipayConfig config) {
         Boolean b = null;
         try {
             b = AliPayUtil.closeorder(reqVO, config);
@@ -180,7 +234,27 @@ public class AliPayProductImpl implements PayProduct {
     }
 
     @Override
+    public Boolean reverse(PayReqVO reqVO, Object cfg) {
+        throw new RuntimeException("支付宝不支持");
+    }
+
+    @Override
     public Boolean refund(RefundReqVO reqVO) {
+        return getRefund(reqVO, config);
+    }
+
+    @Override
+    public Boolean refund(RefundReqVO reqVO, Object cfg) {
+        AlipayConfig alipayConfig;
+        if (ObjectUtil.isNotEmpty(cfg)) {
+            alipayConfig = (AlipayConfig) cfg;
+        } else {
+            alipayConfig = config;
+        }
+        return getRefund(reqVO, alipayConfig);
+    }
+
+    private Boolean getRefund(RefundReqVO reqVO, AlipayConfig alipayConfig) {
         AliRefundReqVO aliRefundReqVO = new AliRefundReqVO();
         aliRefundReqVO.setOrderNo(reqVO.getOrderNo());
         aliRefundReqVO.setRefundAmount(reqVO.getRefundFee());
@@ -192,7 +266,7 @@ public class AliPayProductImpl implements PayProduct {
         }
         Boolean b = null;
         try {
-            b = AliPayUtil.refund(aliRefundReqVO, config);
+            b = AliPayUtil.refund(aliRefundReqVO, alipayConfig);
             log.info(HEAD + "退款申请:{}", b);
         } catch (Exception e) {
             log.error(HEAD + "退款申请失败：", e);
@@ -203,9 +277,24 @@ public class AliPayProductImpl implements PayProduct {
 
     @Override
     public AliRefundEnum refundquery(RefundReqVO reqVO) {
+        return getRefundquery(reqVO, config);
+    }
+
+    @Override
+    public AliRefundEnum refundquery(RefundReqVO reqVO, Object cfg) {
+        AlipayConfig alipayConfig;
+        if (ObjectUtil.isNotEmpty(cfg)) {
+            alipayConfig = (AlipayConfig) cfg;
+        } else {
+            alipayConfig = config;
+        }
+        return getRefundquery(reqVO, alipayConfig);
+    }
+
+    private AliRefundEnum getRefundquery(RefundReqVO reqVO, AlipayConfig alipayConfig) {
         AliRefundEnum aliRefundEnum = null;
         try {
-            aliRefundEnum = AliPayUtil.refundquery(reqVO, config);
+            aliRefundEnum = AliPayUtil.refundquery(reqVO, alipayConfig);
             log.info(HEAD + "查询退款订单:{}", JSON.toJSONString(aliRefundEnum));
         } catch (Exception e) {
             log.error(HEAD + "查询退款订单失败：", e);
@@ -216,9 +305,24 @@ public class AliPayProductImpl implements PayProduct {
 
     @Override
     public AliOrderRespVO callback(HttpServletRequest request) {
+        return getCallback(request, config);
+    }
+
+    @Override
+    public AliOrderRespVO callback(HttpServletRequest request, Object cfg) {
+        AlipayConfig alipayConfig;
+        if (ObjectUtil.isNotEmpty(cfg)) {
+            alipayConfig = (AlipayConfig) cfg;
+        } else {
+            alipayConfig = config;
+        }
+        return getCallback(request, alipayConfig);
+    }
+
+    private AliOrderRespVO getCallback(HttpServletRequest request, AlipayConfig alipayConfig) {
         AliOrderRespVO aliOrderRespVO = null;
         try {
-            aliOrderRespVO = AliPayUtil.callback(request, config);
+            aliOrderRespVO = AliPayUtil.callback(request, alipayConfig);
             log.info(HEAD + "支付回调:{}", JSON.toJSONString(aliOrderRespVO));
         } catch (Exception e) {
             log.error(HEAD + "支付回调失败：", e);

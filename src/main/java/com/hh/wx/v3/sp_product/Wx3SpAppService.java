@@ -6,6 +6,7 @@ import com.hh.factory.products.PayV3Product;
 import com.hh.factory.util.OrderCheck;
 import com.hh.factory.vo.req.PayReqVO;
 import com.hh.wx.v2.enums.WxPayEnum;
+import com.hh.wx.v3.constant.Wx3ConfigConstant;
 import com.hh.wx.v3.constant.Wx3Constant;
 import com.wechat.pay.java.core.Config;
 import com.wechat.pay.java.core.RSAAutoCertificateConfig;
@@ -36,25 +37,46 @@ public class Wx3SpAppService implements PayV3Product {
     private static final String HEAD = "[微信支付V3]-[APP支付]";
 
     @Override
-    public Map<String, String> placeOrder(PayReqVO reqVO) {
+    public Map<String, String> placeOrder(PayReqVO reqVO, Wx3ConfigConstant cfg) {
+        Config config;
+        String notifyUrl;
+        String appid;
+        String mchid;
+        if (ObjectUtil.isNotEmpty(cfg)) {
+            config = new RSAAutoCertificateConfig.Builder()
+                    .merchantId(cfg.getMerchantId())
+                    .privateKeyFromPath(cfg.getPrivateKeyPath())
+                    .merchantSerialNumber(cfg.getMerchantSerialNumber())
+                    .apiV3Key(cfg.getApiV3Key())
+                    .build();
+            appid = cfg.getAppid();
+            mchid = cfg.getMchId();
+        } else {
+            config = new RSAAutoCertificateConfig.Builder()
+                    .merchantId(wx3Constant.getMerchantId())
+                    .privateKeyFromPath(wx3Constant.getPrivateKeyPath())
+                    .merchantSerialNumber(wx3Constant.getMerchantSerialNumber())
+                    .apiV3Key(wx3Constant.getApiV3Key())
+                    .build();
+            appid = wx3Constant.getAppid();
+            mchid = wx3Constant.getMchId();
+        }
+        if (ObjectUtil.isNotEmpty(reqVO.getNotifyUrl())) {
+            notifyUrl = reqVO.getNotifyUrl();
+        } else {
+            notifyUrl = wx3Constant.getNotifyUrl();
+        }
         // 下单参数为空判断
         orderCheck.placeOrderIsNull2(reqVO);
-        // 使用自动更新平台证书的RSA配置,一个商户号只能初始化一个配置，否则会因为重复的下载任务报错
-        Config config = new RSAAutoCertificateConfig.Builder()
-                .merchantId(wx3Constant.getMerchantId())
-                .privateKeyFromPath(wx3Constant.getPrivateKeyPath())
-                .merchantSerialNumber(wx3Constant.getMerchantSerialNumber())
-                .apiV3Key(wx3Constant.getApiV3Key())
-                .build();
         AppServiceExtension service = new AppServiceExtension.Builder().config(config).build();
         PrepayRequest request = new PrepayRequest();
         Amount amount = new Amount();
         amount.setTotal(reqVO.getAmounts().multiply(new BigDecimal(100)).intValue());
         request.setAmount(amount);
-        request.setSpAppid(wx3Constant.getAppid());
-        request.setSpMchid(wx3Constant.getMchId());
+        request.setSpAppid(appid);
+        request.setSpMchid(mchid);
         request.setDescription(reqVO.getDescription());
-        request.setNotifyUrl(wx3Constant.getNotifyUrl());
+        request.setNotifyUrl(notifyUrl);
         request.setOutTradeNo(reqVO.getOrderNo());
         request.setSubMchid(reqVO.getSubMchId());
         log.info(HEAD + "统一下单,入参:{}", JSON.toJSONString(request));

@@ -8,6 +8,7 @@ import com.hh.factory.products.PayV3Product;
 import com.hh.factory.util.OrderCheck;
 import com.hh.factory.vo.req.PayReqVO;
 import com.hh.wx.v2.enums.WxPayEnum;
+import com.hh.wx.v3.constant.Wx3ConfigConstant;
 import com.hh.wx.v3.constant.Wx3Constant;
 import com.wechat.pay.java.core.Config;
 import com.wechat.pay.java.core.RSAAutoCertificateConfig;
@@ -41,23 +42,45 @@ public class Wx3H5Service implements PayV3Product {
     private static final String HEAD = "[微信支付V3]-[H5支付]";
 
     @Override
-    public Map<String, String> placeOrder(PayReqVO reqVO) {
+    public Map<String, String> placeOrder(PayReqVO reqVO, Wx3ConfigConstant cfg) {
+        Config config;
+        String notifyUrl;
+        String appid;
+        String mchid;
+        if (ObjectUtil.isNotEmpty(cfg)) {
+            config = new RSAAutoCertificateConfig.Builder()
+                    .merchantId(cfg.getMerchantId())
+                    .privateKeyFromPath(cfg.getPrivateKeyPath())
+                    .merchantSerialNumber(cfg.getMerchantSerialNumber())
+                    .apiV3Key(cfg.getApiV3Key())
+                    .build();
+            appid = cfg.getAppid();
+            mchid = cfg.getMchId();
+        } else {
+            config = new RSAAutoCertificateConfig.Builder()
+                    .merchantId(wx3Constant.getMerchantId())
+                    .privateKeyFromPath(wx3Constant.getPrivateKeyPath())
+                    .merchantSerialNumber(wx3Constant.getMerchantSerialNumber())
+                    .apiV3Key(wx3Constant.getApiV3Key())
+                    .build();
+            appid = wx3Constant.getAppid();
+            mchid = wx3Constant.getMchId();
+        }
+        if (ObjectUtil.isNotEmpty(reqVO.getNotifyUrl())) {
+            notifyUrl = reqVO.getNotifyUrl();
+        } else {
+            notifyUrl = wx3Constant.getNotifyUrl();
+        }
         orderCheck.placeOrderIsNull2(reqVO);
-        Config config = new RSAAutoCertificateConfig.Builder()
-                        .merchantId(wx3Constant.getMerchantId())
-                        .privateKeyFromPath(wx3Constant.getPrivateKeyPath())
-                        .merchantSerialNumber(wx3Constant.getMerchantSerialNumber())
-                        .apiV3Key(wx3Constant.getApiV3Key())
-                        .build();
         H5Service service = new H5Service.Builder().config(config).build();
         PrepayRequest request = new PrepayRequest();
         Amount amount = new Amount();
         amount.setTotal(reqVO.getAmounts().multiply(new BigDecimal(100)).intValue());
         request.setAmount(amount);
-        request.setAppid(wx3Constant.getAppid());
-        request.setMchid(wx3Constant.getMchId());
+        request.setAppid(appid);
+        request.setMchid(mchid);
         request.setDescription(reqVO.getDescription());
-        request.setNotifyUrl(wx3Constant.getNotifyUrl());
+        request.setNotifyUrl(notifyUrl);
         request.setOutTradeNo(reqVO.getOrderNo());
         SceneInfo sceneInfo = new SceneInfo();
         sceneInfo.setPayerClientIp(new ArrayList<>(NetUtil.localIpv4s()).get(0));

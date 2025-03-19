@@ -63,4 +63,14 @@ public class PayReqVO {
      * 子商户授权token
      */
     private String subAuthToken;
+
+    /**
+     * 回调地址
+     */
+    private String notifyUrl;
+
+    /**
+     * 小程序支付中，商户实际经营主体的小程序应用的appid
+     */
+    private String opAppId;
 }
