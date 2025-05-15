@@ -56,11 +56,13 @@ public class PayReqVO {
 
     /**
      * 子商户号
+     * 微信使用
      */
     private String subMchId;
 
     /**
      * 子商户授权token
+     * 支付宝
      */
     private String subAuthToken;
 
@@ -73,4 +75,17 @@ public class PayReqVO {
      * 小程序支付中，商户实际经营主体的小程序应用的appid
      */
     private String opAppId;
+
+    /**
+     * 子商户公众账号ID
+     * 微信分配的子商户公众账号ID，如需在支付完成后获取sub_openid则此参数必传
+     */
+    private String subAppid;
+
+    /**
+     * 用户子标识
+     * trade_type=JSAPI，此参数必传，用户在子商户appid下的唯一标识。openid和sub_openid可以选传其中之一，如果选择传sub_openid,则必须传sub_appid
+     */
+    private String subOpenid;
+
 }

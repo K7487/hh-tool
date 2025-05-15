@@ -91,6 +91,12 @@ public class WxPaymentUtil {
         if (ObjectUtil.isNotEmpty(reqVO.getSubMchId())) {
             reqMap.put("sub_mch_id", reqVO.getSubMchId());
         }
+        if (ObjectUtil.isNotEmpty(reqVO.getSubAppid())) {
+            reqMap.put("sub_appid", reqVO.getSubAppid());
+        }
+        if (ObjectUtil.isNotEmpty(reqVO.getSubOpenid())) {
+            reqMap.put("sub_openid", reqVO.getSubOpenid());
+        }
         String sign = null;
         try {
             sign = WXPayUtil.generateSignature(reqMap, config.getKey());
@@ -134,13 +140,21 @@ public class WxPaymentUtil {
         Map<String, String> data = new TreeMap<>();
         switch (reqVO.getTradeType()) {
             case Pay.TradeType.JSAPI:
-                data.put("appId", config.getAppID());
+                if (ObjectUtil.isNotEmpty(reqVO.getSubAppid())) {
+                    data.put("appId", reqVO.getSubAppid());
+                } else {
+                    data.put("appId", config.getAppID());
+                }
                 data.put("timeStamp", String.valueOf(System.currentTimeMillis() / 1000));
                 data.put("nonceStr", WXPayUtil.generateNonceStr());
                 data.put("package", "prepay_id=" + resqMap.get("prepay_id"));
                 data.put("signType", "MD5");
                 try {
-                    data.put("sign", WXPayUtil.generateSignature(data, config.getKey()));
+                    if (ObjectUtil.isNotEmpty(reqVO.getSubAppid())) {
+                        data.put("paySign", WXPayUtil.generateSignature(data, config.getKey()));
+                    } else {
+                        data.put("sign", WXPayUtil.generateSignature(data, config.getKey()));
+                    }
                 } catch (Exception e) {
                     log.error("签名失败：", e);
                     e.printStackTrace();
