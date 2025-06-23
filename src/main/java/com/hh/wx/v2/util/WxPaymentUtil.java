@@ -23,7 +23,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 微信V2版本支付工具类

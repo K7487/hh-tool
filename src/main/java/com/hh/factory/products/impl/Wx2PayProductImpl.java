@@ -3,7 +3,6 @@ package com.hh.factory.products.impl;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson2.JSON;
-import com.alipay.api.AlipayConfig;
 import com.github.wxpay.sdk.WXPayConfig;
 import com.hh.constants.Pay;
 import com.hh.enums.PayType;
@@ -19,11 +18,11 @@ import com.hh.wx.v2.enums.WxRefundEnum;
 import com.hh.wx.v2.util.WxPaymentUtil;
 import com.hh.wx.v2.vo.WxOrderReqVO;
 import com.hh.wx.v2.vo.WxRefundReqVO;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Map;
 

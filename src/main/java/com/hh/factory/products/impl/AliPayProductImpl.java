@@ -16,11 +16,11 @@ import com.hh.factory.products.PayProduct;
 import com.hh.factory.util.OrderCheck;
 import com.hh.factory.vo.req.PayReqVO;
 import com.hh.factory.vo.req.RefundReqVO;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * 支付宝支付实现类

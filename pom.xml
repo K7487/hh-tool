@@ -7,7 +7,7 @@
     <!--gav信息-->
     <groupId>io.github.K7487</groupId>
     <artifactId>hh-tool</artifactId>
-    <version>svt1.0.7</version>
+    <version>svt1.0.8</version>
 
     <!--项目信息...-->
     <name>hh-tool</name>
@@ -125,11 +125,18 @@
 <!--            <version>3.2.1</version>-->
 <!--        </dependency>-->
 
+<!--        <dependency>-->
+<!--            <groupId>javax.servlet</groupId>-->
+<!--            <artifactId>javax.servlet-api</artifactId>-->
+<!--            <version>4.0.1</version>-->
+<!--&lt;!&ndash;            <scope>provided</scope>&ndash;&gt;-->
+<!--        </dependency>-->
+
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
-<!--            <scope>provided</scope>-->
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
@@ -173,54 +180,54 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>3.0.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.0.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                                <!-- java8版本导致javadoc打包编译失败时候，添加-->
-                                <configuration>
-                                    <failOnError>false</failOnError>
-                                    <doclint>none</doclint>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
 <!--                    <plugin>-->
 <!--                        <groupId>org.apache.maven.plugins</groupId>-->
-<!--                        <artifactId>maven-dependency-plugin</artifactId>-->
-<!--                        <version>3.1.2</version>-->
+<!--                        <artifactId>maven-source-plugin</artifactId>-->
+<!--                        <version>3.0.1</version>-->
 <!--                        <executions>-->
 <!--                            <execution>-->
+<!--                                <id>attach-sources</id>-->
 <!--                                <goals>-->
-<!--                                    <goal>sources</goal>-->
-<!--                                    <goal>resolve</goal>-->
+<!--                                    <goal>jar-no-fork</goal>-->
 <!--                                </goals>-->
+<!--                            </execution>-->
+<!--                        </executions>-->
+<!--                    </plugin>-->
+<!--                    <plugin>-->
+<!--                        <groupId>org.apache.maven.plugins</groupId>-->
+<!--                        <artifactId>maven-javadoc-plugin</artifactId>-->
+<!--                        <version>3.0.1</version>-->
+<!--                        <executions>-->
+<!--                            <execution>-->
+<!--                                <id>attach-javadocs</id>-->
+<!--                                <phase>package</phase>-->
+<!--                                <goals>-->
+<!--                                    <goal>jar</goal>-->
+<!--                                </goals>-->
+<!--                                &lt;!&ndash; java8版本导致javadoc打包编译失败时候，添加&ndash;&gt;-->
 <!--                                <configuration>-->
-<!--                                    <classifier>javadoc</classifier>-->
+<!--                                    <failOnError>false</failOnError>-->
+<!--                                    <doclint>none</doclint>-->
 <!--                                </configuration>-->
 <!--                            </execution>-->
 <!--                        </executions>-->
 <!--                    </plugin>-->
+                    <!-- Maven Source 插件（可选） -->
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
                 </plugins>
             </build>
         </profile>

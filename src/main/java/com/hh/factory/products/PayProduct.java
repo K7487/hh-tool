@@ -4,7 +4,7 @@ package com.hh.factory.products;
 import com.hh.factory.vo.req.PayReqVO;
 import com.hh.factory.vo.req.RefundReqVO;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public interface PayProduct {
 
