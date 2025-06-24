@@ -536,10 +536,14 @@ public class WxPaymentUtil {
         Map<String, Object> map = XMLUtil.decodeXml(result);
         log.info(HEAD + "回调map:{}", JSON.toJSONString(map));
         wxOrderRespVO.setDataMap(map);
-
         if ("SUCCESS".equals(map.get("result_code")) && "SUCCESS".equals(map.get("return_code"))) {
             wxOrderRespVO.setR(true);
-            if (ObjectUtil.isNotEmpty(map.get("req_info"))) {
+            wxOrderRespVO.setType(1);
+            wxOrderRespVO.setOrderNo(map.get("out_trade_no").toString());
+        } else if ("SUCCESS".equals(map.get("return_code")) && ObjectUtil.isNotEmpty(map.get("req_info"))) {
+            wxOrderRespVO.setR(true);
+            wxOrderRespVO.setType(2);
+            if (ObjectUtil.isNotEmpty(config) && ObjectUtil.isNotEmpty(config.getKey())) {
                 String req_infoString = map.get("req_info").toString();
                 String req_info_decrypt = null;
                 try {
@@ -552,16 +556,34 @@ public class WxPaymentUtil {
                 log.info(HEAD + "退款map:{}", JSON.toJSONString(reqInfoMap));
                 wxOrderRespVO.setOrderNo(reqInfoMap.get("out_trade_no").toString());
                 wxOrderRespVO.setDataMap(reqInfoMap);
-                wxOrderRespVO.setType(2);
-            } else {
-                wxOrderRespVO.setType(1);
-                wxOrderRespVO.setOrderNo(map.get("out_trade_no").toString());
             }
         } else {
             wxOrderRespVO.setR(false);
         }
         log.info(HEAD + "微信支付回调,返回:{}", JSON.toJSONString(wxOrderRespVO));
         return wxOrderRespVO;
+    }
+
+    /**
+     * 退款密文解密
+     * @param respVO 微信支付下单返回对象
+     * @param key 密钥
+     * @return
+     */
+    public static WxOrderRespVO decryptData(WxOrderRespVO respVO, String key) {
+        String req_infoString = respVO.getDataMap().get("req_info").toString();
+        String req_info_decrypt = null;
+        try {
+            req_info_decrypt = AESUtil.decryptData(req_infoString, key);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        log.info(HEAD + "退款字符串:{}", req_info_decrypt);
+        Map<String, Object> reqInfoMap = XMLUtil.decodeXml(req_info_decrypt);
+        log.info(HEAD + "退款map:{}", JSON.toJSONString(reqInfoMap));
+        respVO.setOrderNo(reqInfoMap.get("out_trade_no").toString());
+        respVO.setDataMap(reqInfoMap);
+        return respVO;
     }
 
 }

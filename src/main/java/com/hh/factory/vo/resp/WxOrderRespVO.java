@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 /*
- * 微信支付下单对象
+ * 微信支付下单返回对象
  */
 @Data
 @NoArgsConstructor
